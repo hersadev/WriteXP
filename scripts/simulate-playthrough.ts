@@ -40,7 +40,9 @@ for (const chapter of CHAPTERS) {
   for (const node of chapter.nodes) {
     if (WRITING_KINDS.includes(node.kind)) {
       const writing = node as WritingNode;
-      const answer = writing.model ?? writing.answers?.[0] ?? writing.hint ?? '';
+      // Nunca la pista: está en español y contarla como respuesta falsea las palabras escritas.
+      const answer = writing.model ?? writing.answers?.[0] ?? '';
+      assert(Boolean(answer), `${writing.id}: no hay respuesta modelo con la que jugar`);
       const graded = gradeWriting(writing, answer);
 
       assert(
