@@ -94,6 +94,8 @@ export const B2_CHAPTERS: Chapter[] = [
         },
         hint:
           "The Guild's handling of the incident has been widely criticised and several procedures appear to require revision.",
+        model:
+          "The Guild's handling of the incident has been widely criticised and several procedures appear to require revision.",
         placeholder: "The Guild's handling…",
         multiline: true,
       },
@@ -208,6 +210,8 @@ export const B2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint:
+          'Although the Chancellor is right that the archive lacks security, this does not justify closing it to the public.',
+        model:
           'Although the Chancellor is right that the archive lacks security, this does not justify closing it to the public.',
         placeholder: 'Although…',
         multiline: true,
@@ -332,6 +336,7 @@ export const B2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'A city that locks away its own memory has already begun to forget itself.',
+        model: 'A city that locks away its own memory has already begun to forget itself.',
         placeholder: 'Escribe tu frase…',
         multiline: true,
       },

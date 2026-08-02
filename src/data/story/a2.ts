@@ -74,6 +74,7 @@ export const A2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'Last night I arrived in Blackmill and I slept in the old inn.',
+        model: 'Last night I arrived in Blackmill and I slept in the old inn.',
         placeholder: 'Last night I…',
         multiline: true,
       },
@@ -106,6 +107,7 @@ export const A2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'Why did you not get up? / What did you hear?',
+        model: 'What did you hear last night?',
         placeholder: 'Why did…',
       },
       {
@@ -206,6 +208,7 @@ export const A2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'He was tall and had dark hair. He wore a long black coat.',
+        model: 'He was tall and had dark hair. He wore a long black coat.',
         placeholder: 'He was…',
         multiline: true,
       },
@@ -238,6 +241,7 @@ export const A2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'Witness 5 is less reliable than witness 6.',
+        model: 'Witness 5 is less reliable than witness 6.',
         placeholder: 'Witness … is … than …',
       },
       {
@@ -337,6 +341,7 @@ export const A2_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'Excuse me, how do I get to the mill?',
+        model: 'Excuse me, how do I get to the mill?',
         placeholder: 'Excuse me, how…',
       },
       {
