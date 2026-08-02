@@ -16,6 +16,12 @@ import type { WritingNode } from '../src/types';
 const problems: string[] = [];
 const WRITING_KINDS = ['writeWord', 'gapFill', 'writeSentence', 'writeFree'];
 
+const words = (text: string): number => (text.trim() ? text.trim().split(/\s+/).length : 0);
+
+/** La respuesta más corta que se acepta: es la que escribe el jugador con prisa. */
+const shortestAnswerWords = (node: WritingNode): number | undefined =>
+  node.answers?.length ? Math.min(...node.answers.map(words)) : undefined;
+
 const chapterIds = new Set<string>();
 const nodeIds = new Set<string>();
 const goalIds = new Set<string>();
@@ -39,23 +45,25 @@ for (const chapter of CHAPTERS) {
   /*
    * Los objetivos de palabras son metas ambiciosas, no requisitos: se admite
    * que estén por encima del mínimo exigido, pero no que sean inalcanzables.
-   * `floor` = escribiendo lo mínimo en cada ejercicio.
-   * `ceiling` = escribiendo con holgura, sin pasarse de ningún maxWords.
+   * `floor` = escribiendo lo mínimo que acepta cada ejercicio.
+   * `model` = escribiendo exactamente la solución modelo de cada ejercicio, que
+   *   es lo máximo que se le puede pedir a un jugador real. Ojo: aquí NO vale
+   *   mirar la pista, porque está en español y no es una respuesta.
    */
   const wordsGoal = chapter.goals.find((goal) => goal.kind === 'words');
   const writingNodes = chapter.nodes.filter((node) => WRITING_KINDS.includes(node.kind)) as WritingNode[];
   const floorWords = writingNodes.reduce(
-    (sum, node) => sum + (node.rubric?.minWords ?? node.answers?.[0]?.split(/\s+/).length ?? 1),
+    (sum, node) => sum + (node.rubric?.minWords ?? shortestAnswerWords(node) ?? 1),
     0,
   );
-  const ceilingWords = writingNodes.reduce((sum, node) => {
-    if (!node.rubric?.minWords) return sum + (node.answers?.[0]?.split(/\s+/).length ?? 1);
-    return sum + (node.rubric.maxWords ?? Math.round(node.rubric.minWords * 2));
-  }, 0);
+  const modelWords = writingNodes.reduce(
+    (sum, node) => sum + (node.model ? words(node.model) : (shortestAnswerWords(node) ?? node.rubric?.minWords ?? 1)),
+    0,
+  );
 
-  if (wordsGoal?.value && wordsGoal.value > ceilingWords) {
+  if (wordsGoal?.value && wordsGoal.value > modelWords) {
     problems.push(
-      `${chapter.id}: el objetivo "${wordsGoal.label}" pide ${wordsGoal.value} palabras y como mucho se llega a ~${ceilingWords}`,
+      `${chapter.id}: el objetivo "${wordsGoal.label}" pide ${wordsGoal.value} palabras y respondiendo con la solución modelo sólo se escriben ${modelWords}`,
     );
   }
   if (wordsGoal?.value && wordsGoal.value <= floorWords) {
@@ -98,13 +106,17 @@ for (const chapter of CHAPTERS) {
     if (!writing.hint) problems.push(`${writing.id}: sin pista (el jugador se quedaría bloqueado)`);
     if (!writing.promptEs) problems.push(`${writing.id}: sin consigna en español`);
 
-    // En redacciones largas la pista es un andamiaje, así que hace falta un texto ejemplar.
-    if ((writing.rubric?.minWords ?? 0) >= 20 && !writing.model) {
-      problems.push(`${writing.id}: redacción larga sin 'model' (al rendirse no habría solución que enseñar)`);
+    /*
+     * Sin `answers` la pista es un andamiaje (a menudo en español), así que hace
+     * falta un texto ejemplar: sin él, al rendirse se enseñaría la pista como si
+     * fuera la solución, y los objetivos de palabras se calibrarían contra ella.
+     */
+    if (!writing.answers?.length && !writing.model) {
+      problems.push(`${writing.id}: ejercicio con rúbrica sin 'model' (la pista no es una respuesta)`);
     }
 
     // La prueba de fuego: la solución modelo tiene que aprobar.
-    const model = writing.model ?? writing.answers?.[0] ?? writing.hint;
+    const model = writing.model ?? writing.answers?.[0];
     if (!model) continue;
     const result = gradeWriting(writing, model);
     if (result.grade !== 'perfect') {

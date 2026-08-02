@@ -19,7 +19,7 @@ export const A1_CHAPTERS: Chapter[] = [
       { id: 'a1-1-complete', kind: 'complete', label: 'Termina el capítulo', xp: 20 },
       { id: 'a1-1-perfect', kind: 'perfect', value: 4, label: 'Acierta 4 respuestas a la primera', xp: 25 },
       { id: 'a1-1-noreveal', kind: 'noReveal', label: 'Sin revelar ninguna solución', xp: 25 },
-      { id: 'a1-1-words', kind: 'words', value: 9, label: 'Escribe 9 palabras en inglés', xp: 15 },
+      { id: 'a1-1-words', kind: 'words', value: 8, label: 'Escribe 8 palabras en inglés', xp: 15 },
     ],
     nodes: [
       {
@@ -103,6 +103,7 @@ export const A1_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'Estructura: My name is + tu nombre + punto final.',
+        model: 'My name is Alex.',
         placeholder: 'My name is…',
         success: 'The letters glow on the paper. For a second, the rain stops above you.',
       },
@@ -215,6 +216,7 @@ export const A1_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'Ejemplo de estructura: I want bread and two apples.',
+        model: 'I want bread and two apples.',
         placeholder: 'I want…',
         success: 'The baker laughs and puts the bread in your bag. It is warm.',
       },
@@ -247,6 +249,7 @@ export const A1_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'He is an old man with a blue hat.',
+        model: 'He is an old man with a blue hat.',
         placeholder: 'He is…',
       },
       {
@@ -328,6 +331,7 @@ export const A1_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'I live in + ciudad.',
+        model: 'I live in Lumen.',
         placeholder: 'I live in…',
       },
       {
@@ -348,6 +352,7 @@ export const A1_CHAPTERS: Chapter[] = [
           requireFinalPunctuation: true,
         },
         hint: 'I have one sister and two brothers.',
+        model: 'I have one sister and two brothers.',
         placeholder: 'I have…',
       },
       {
