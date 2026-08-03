@@ -146,7 +146,7 @@ export function WritingCard({
           )}
 
           {revealed && model && (
-            <p style={{ marginTop: 10, fontFamily: 'var(--serif)', fontSize: 16 }}>«{model}»</p>
+            <p style={{ marginTop: 10, fontFamily: 'var(--prose)', fontSize: 17 }}>«{model}»</p>
           )}
         </div>
       )}
