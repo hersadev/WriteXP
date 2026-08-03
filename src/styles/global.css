@@ -1,35 +1,79 @@
 /* ==========================================================================
    WriteXP — sistema visual
-   Fantasía oscura: pergamino sobre piedra, oro para el progreso.
+   Códice medieval: pergamino con tinta ferrogálica sobre un campo de batalla
+   de piedra, con emblema de espadas cruzadas, picas y sellos de lacre.
    ========================================================================== */
 
 :root {
-  --bg: #0b0d18;
-  --bg-deep: #070811;
-  --surface: #141827;
-  --surface-2: #1b2033;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  /* ---------- Ornamentos (SVG en línea, sin peticiones externas) ---------- */
 
-  --ink: #eceaf5;
-  --muted: #9096b5;
-  --faint: #666d90;
+  /* Escudo con espadas cruzadas: dorado, para el fondo oscuro. */
+  --art-emblem-gilt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%23c9a24a' stroke-width='3' stroke-linejoin='round' stroke-linecap='round' opacity='.5'%3E%3Cpath d='M120 26 L196 54 V116 C196 158 164 186 120 206 C76 186 44 158 44 116 V54 Z'/%3E%3Cpath d='M120 41 L182 64 V116 C182 150 155 174 120 191 C85 174 58 150 58 116 V64 Z' stroke-width='1.4'/%3E%3Cg transform='rotate(45 120 120)'%3E%3Cpath d='M120 18 L129 50 V140 H111 V50 Z'/%3E%3Cpath d='M92 140 H148 V153 H92 Z'/%3E%3Cpath d='M113 153 H127 V182 H113 Z'/%3E%3Ccircle cx='120' cy='192' r='9'/%3E%3C/g%3E%3Cg transform='rotate(-45 120 120)'%3E%3Cpath d='M120 18 L129 50 V140 H111 V50 Z'/%3E%3Cpath d='M92 140 H148 V153 H92 Z'/%3E%3Cpath d='M113 153 H127 V182 H113 Z'/%3E%3Ccircle cx='120' cy='192' r='9'/%3E%3C/g%3E%3C/svg%3E");
 
-  --gold: #e5b76a;
-  --gold-dim: #a8843f;
-  --good: #5ec4a8;
-  --bad: #f2777a;
-  --warn: #f0b95b;
+  /* El mismo emblema en sepia muy tenue: filigrana sobre el pergamino. */
+  --art-emblem-faint: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%235a3d18' stroke-width='3' stroke-linejoin='round' stroke-linecap='round' opacity='.075'%3E%3Cpath d='M120 26 L196 54 V116 C196 158 164 186 120 206 C76 186 44 158 44 116 V54 Z'/%3E%3Cpath d='M120 41 L182 64 V116 C182 150 155 174 120 191 C85 174 58 150 58 116 V64 Z' stroke-width='1.4'/%3E%3Cg transform='rotate(45 120 120)'%3E%3Cpath d='M120 18 L129 50 V140 H111 V50 Z'/%3E%3Cpath d='M92 140 H148 V153 H92 Z'/%3E%3Cpath d='M113 153 H127 V182 H113 Z'/%3E%3Ccircle cx='120' cy='192' r='9'/%3E%3C/g%3E%3Cg transform='rotate(-45 120 120)'%3E%3Cpath d='M120 18 L129 50 V140 H111 V50 Z'/%3E%3Cpath d='M92 140 H148 V153 H92 Z'/%3E%3Cpath d='M113 153 H127 V182 H113 Z'/%3E%3Ccircle cx='120' cy='192' r='9'/%3E%3C/g%3E%3C/svg%3E");
 
-  --parchment: #f3e8d0;
-  --parchment-ink: #2f2718;
-  --parchment-line: rgba(47, 39, 24, 0.16);
+  /* Damasco de cuadrifolios: tapiz de fondo. */
+  --art-diaper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23c9a24a' stroke-width='1.1' opacity='.42'%3E%3Ccircle cx='40' cy='30' r='10'/%3E%3Ccircle cx='40' cy='50' r='10'/%3E%3Ccircle cx='30' cy='40' r='10'/%3E%3Ccircle cx='50' cy='40' r='10'/%3E%3C/g%3E%3Cg fill='%23c9a24a' opacity='.3'%3E%3Ccircle cx='0' cy='0' r='1.8'/%3E%3Ccircle cx='80' cy='0' r='1.8'/%3E%3Ccircle cx='0' cy='80' r='1.8'/%3E%3Ccircle cx='80' cy='80' r='1.8'/%3E%3Ccircle cx='40' cy='40' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
 
-  --radius: 14px;
-  --radius-sm: 9px;
-  --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  /* Bosque de picas y estandartes en el horizonte. */
+  --art-pikes: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 220'%3E%3Cdefs%3E%3Cg id='p' fill='%23070504'%3E%3Crect x='-1.6' y='-150' width='3.2' height='150'/%3E%3Cpath d='M0 -170 L5.5 -150 H-5.5 Z'/%3E%3C/g%3E%3Cg id='b' fill='%23070504'%3E%3Crect x='-1.6' y='-160' width='3.2' height='160'/%3E%3Cpath d='M0 -180 L5.5 -160 H-5.5 Z'/%3E%3Cpath d='M2 -152 H44 L36 -132 L44 -112 H2 Z'/%3E%3C/g%3E%3C/defs%3E%3Cg transform='translate(0 220)'%3E%3Cuse href='%23p' x='14' transform='scale(1 .74)'/%3E%3Cuse href='%23p' x='42' transform='scale(1 .92)'/%3E%3Cuse href='%23b' x='72' transform='scale(1 .8)'/%3E%3Cuse href='%23p' x='104' transform='scale(1 .68)'/%3E%3Cuse href='%23p' x='128' transform='scale(1 .88)'/%3E%3Cuse href='%23p' x='156' transform='scale(1 .76)'/%3E%3Cuse href='%23p' x='182' transform='scale(1 .95)'/%3E%3Cuse href='%23b' x='212' transform='scale(1 .72)'/%3E%3Cuse href='%23p' x='246' transform='scale(1 .84)'/%3E%3Cuse href='%23p' x='270' transform='scale(1 .66)'/%3E%3Cuse href='%23p' x='296' transform='scale(1 .9)'/%3E%3Cuse href='%23b' x='322' transform='scale(1 .78)'/%3E%3Cuse href='%23p' x='356' transform='scale(1 .7)'/%3E%3Cuse href='%23p' x='382' transform='scale(1 .86)'/%3E%3Cuse href='%23p' x='406' transform='scale(1 .74)'/%3E%3C/g%3E%3C/svg%3E");
 
-  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  /* Fibra de papel / grano de piedra. */
+  --art-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23f)' opacity='.55'/%3E%3C/svg%3E");
+
+  /* Filete ornamental con losange central. */
+  --art-rule: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 190 18' fill='none' stroke='%236b4a18' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M6 9 H74'/%3E%3Cpath d='M184 9 H116'/%3E%3Cpath d='M95 2 L102 9 L95 16 L88 9 Z'/%3E%3Cpath d='M80 9 L84.5 6 M80 9 L84.5 12'/%3E%3Cpath d='M110 9 L105.5 6 M110 9 L105.5 12'/%3E%3C/svg%3E");
+
+  /* ---------- Tinturas ---------- */
+
+  --stone: #0c0906;
+  --leather: #241a10;
+  --leather-2: #16100a;
+  --wood: #4a3320;
+  --iron: #4c4a45;
+
+  --parchment: #e9dcbc;
+  --parchment-hi: #f4ecd6;
+  --parchment-lo: #d9c69c;
+  --vellum: #f5edd8;
+
+  --ink: #2b2018;
+  --muted: #5c4831;
+  --faint: #7a6547;
+  --rule: rgba(90, 62, 26, 0.22);
+  --edge: rgba(74, 48, 16, 0.28);
+  --edge-strong: rgba(74, 48, 16, 0.5);
+
+  --blood: #8f2222;
+  --blood-hi: #b8402f;
+  --forest: #3f6b34;
+  --ochre: #97701a;
+
+  --gold: #8a6a1e; /* oro de tinta: legible sobre pergamino */
+  --gilt: #c9a24a; /* oro de metal: sobre superficies oscuras */
+  --gilt-hi: #f0d68f;
+  --cream: #ecdcb4;
+
+  /* Compatibilidad con el resto del código */
+  --bad: #8f2222;
+  --good: #3f6b34;
+  --warn: #97701a;
+  --border: var(--edge);
+  --border-strong: var(--edge-strong);
+  --surface: var(--vellum);
+  --surface-2: var(--parchment-lo);
+  --parchment-ink: var(--ink);
+  --parchment-line: var(--rule);
+
+  --radius: 3px;
+  --radius-sm: 2px;
+  --shadow: 0 10px 24px rgba(28, 16, 4, 0.22);
+
+  /* Capitales romanas para títulos, garamond para la prosa, gótica para el sello */
+  --serif: 'Cinzel', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --prose: 'EB Garamond', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --gothic: 'UnifrakturMaguntia', 'Luminari', 'Cinzel', Georgia, serif;
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
 
   --max: 900px;
@@ -47,15 +91,51 @@ body,
 
 body {
   margin: 0;
-  font-family: var(--sans);
+  font-family: var(--prose);
+  font-size: 17px;
   color: var(--ink);
-  background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(124, 92, 255, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 90% 0%, rgba(229, 183, 106, 0.1), transparent 55%),
-    var(--bg);
+  background-color: var(--stone);
+  background-image:
+    radial-gradient(130% 70% at 50% 110%, rgba(158, 64, 22, 0.22), transparent 62%),
+    radial-gradient(90% 55% at 50% -12%, rgba(120, 92, 48, 0.24), transparent 62%),
+    linear-gradient(180deg, #1c150e, #0b0805 62%, #060403);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.55;
+  line-height: 1.6;
+}
+
+/* Tapiz + grano + viñeta: la sala de piedra donde cuelga el pergamino. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 50% 38%, transparent 38%, rgba(0, 0, 0, 0.62) 100%),
+    var(--art-fiber),
+    var(--art-diaper);
+  background-repeat: no-repeat, repeat, repeat;
+  background-size: cover, 260px 260px, 80px 80px;
+  opacity: 0.55;
+}
+
+/* Emblemas en los márgenes y el ejército de picas en el horizonte. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to top, rgba(6, 4, 3, 0.95), rgba(6, 4, 3, 0.45) 90px, transparent 200px),
+    var(--art-emblem-gilt),
+    var(--art-emblem-gilt),
+    var(--art-pikes);
+  background-repeat: repeat-x, no-repeat, no-repeat, repeat-x;
+  background-position: center bottom, left -70px top 90px, right -70px top 90px, center bottom -20px;
+  background-size: 100% 220px, 320px 320px, 320px 320px, 420px 220px;
+  opacity: 0.9;
 }
 
 h1,
@@ -63,9 +143,10 @@ h2,
 h3,
 h4 {
   margin: 0;
+  font-family: var(--serif);
   line-height: 1.2;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 p {
@@ -87,15 +168,73 @@ textarea {
 }
 
 a {
-  color: var(--gold);
+  color: var(--blood);
+  text-underline-offset: 3px;
 }
 
 /* ---------- Utilidades ---------- */
 
+/* El pergamino: una hoja continua enrollada entre dos varales de madera. */
 .page {
+  position: relative;
+  z-index: 1;
   max-width: var(--max);
+  min-height: calc(100vh - 58px);
   margin: 0 auto;
-  padding: 28px 20px 96px;
+  padding: 52px 44px 108px;
+  color: var(--ink);
+  background-color: var(--parchment);
+  background-image:
+    var(--art-emblem-faint),
+    var(--art-fiber),
+    radial-gradient(46% 32% at 14% 6%, rgba(255, 252, 240, 0.65), transparent 70%),
+    radial-gradient(34% 22% at 86% 34%, rgba(150, 108, 46, 0.16), transparent 70%),
+    radial-gradient(30% 20% at 22% 82%, rgba(150, 108, 46, 0.14), transparent 70%),
+    linear-gradient(90deg, rgba(120, 85, 35, 0.3), transparent 5%, transparent 95%, rgba(120, 85, 35, 0.3)),
+    linear-gradient(172deg, #f2e8cd, #e9dcbc 40%, #e3d3ae 72%, #d9c69c);
+  background-repeat: no-repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 300px 300px, 260px 260px, auto, auto, auto, auto, auto;
+  background-position: right -60px top 30px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  box-shadow:
+    inset 0 0 70px rgba(120, 78, 26, 0.3),
+    inset 0 0 12px rgba(90, 58, 18, 0.4),
+    0 0 0 1px rgba(60, 38, 12, 0.5),
+    0 26px 70px rgba(0, 0, 0, 0.6);
+}
+
+/* Varales del rollo, arriba y abajo. */
+.page::before,
+.page::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  height: 20px;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, #6b4b2a, #3c2916 42%, #22160b 72%, #543a20);
+  box-shadow:
+    inset 0 1px 0 rgba(214, 172, 112, 0.45),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+    0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.page::before {
+  top: 0;
+}
+
+.page::after {
+  bottom: 0;
+}
+
+/* Filete ornamental bajo cada título de pantalla. */
+.page h1::after {
+  content: '';
+  display: block;
+  height: 18px;
+  margin-top: 12px;
+  background: var(--art-rule) no-repeat left center;
+  background-size: 190px 18px;
 }
 
 .stack {
@@ -117,18 +256,29 @@ a {
 }
 
 .eyebrow {
+  font-family: var(--serif);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gold-dim);
+  color: var(--gold);
 }
 
+/* Panel de vitela: una hoja suelta sobre el pergamino. */
 .card {
-  background: linear-gradient(180deg, var(--surface), var(--surface-2));
-  border: 1px solid var(--border);
+  position: relative;
+  background-color: var(--vellum);
+  background-image:
+    var(--art-fiber),
+    linear-gradient(168deg, #f7f0dd, #efe4c8 55%, #e4d5b1);
+  background-repeat: repeat, no-repeat;
+  background-size: 260px 260px, auto;
+  border: 1px solid var(--edge-strong);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 252, 242, 0.55),
+    inset 0 0 30px rgba(150, 108, 46, 0.14),
+    var(--shadow);
 }
 
 /* ---------- Botones ---------- */
@@ -138,21 +288,32 @@ a {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 11px 20px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--edge-strong);
+  background: linear-gradient(180deg, #f1e7cc, #ded0aa 55%, #d0bf94);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 252, 240, 0.8),
+    inset 0 -1px 0 rgba(90, 60, 20, 0.22),
+    0 2px 0 rgba(70, 46, 18, 0.22);
   transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
 
 .btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, #f8f0d9, #e7dab6 55%, #d9c9a0);
   transform: translateY(-1px);
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(70, 46, 18, 0.3);
 }
 
 .btn:disabled {
@@ -160,26 +321,33 @@ a {
   cursor: not-allowed;
 }
 
+/* Placa de bronce dorado: la acción principal. */
 .btn-primary {
-  background: linear-gradient(180deg, #f0c67c, #d09b43);
-  border-color: #f4d193;
-  color: #241a06;
-  box-shadow: 0 8px 22px rgba(208, 155, 67, 0.28);
+  background: linear-gradient(180deg, #f4dc9e, #d9b158 42%, #b4862c 72%, #94691a);
+  border-color: #6b4c12;
+  color: #2a1c05;
+  text-shadow: 0 1px 0 rgba(255, 244, 208, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 246, 216, 0.85),
+    inset 0 -2px 5px rgba(84, 54, 8, 0.4),
+    0 3px 0 rgba(58, 36, 8, 0.35),
+    0 8px 16px rgba(40, 24, 6, 0.28);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #f6d191, #dba64a);
+  background: linear-gradient(180deg, #fbe7b3, #e3bd66 42%, #c0922f 72%, #a1751d);
 }
 
 .btn-ghost {
   border-color: transparent;
-  background: transparent;
+  background: none;
   color: var(--muted);
+  box-shadow: none;
 }
 
 .btn-ghost:hover:not(:disabled) {
+  background: rgba(120, 85, 35, 0.12);
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.06);
 }
 
 .btn-block {
@@ -187,8 +355,8 @@ a {
 }
 
 .btn-sm {
-  padding: 8px 14px;
-  font-size: 13px;
+  padding: 7px 13px;
+  font-size: 11.5px;
 }
 
 /* ---------- Campos ---------- */
@@ -200,9 +368,10 @@ a {
 }
 
 .field label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-family: var(--serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -212,72 +381,99 @@ a {
   width: 100%;
   padding: 12px 14px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--edge-strong);
+  background-color: var(--vellum);
+  font-family: var(--prose);
+  color: var(--ink);
   outline: none;
+  box-shadow: inset 0 2px 5px rgba(90, 60, 20, 0.16);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input:focus,
 .textarea:focus {
-  border-color: var(--gold-dim);
-  box-shadow: 0 0 0 3px rgba(229, 183, 106, 0.15);
+  border-color: var(--gold);
+  box-shadow: inset 0 2px 5px rgba(90, 60, 20, 0.16), 0 0 0 3px rgba(201, 162, 74, 0.3);
 }
 
+/* Renglones de escribano: la caja larga se pauta como un folio. */
 .textarea {
-  min-height: 130px;
+  min-height: 150px;
+  padding: 15px 16px;
+  font-size: 17px;
+  line-height: 30px;
   resize: vertical;
-  line-height: 1.6;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 29px, var(--rule) 29px 30px);
+  background-position: 0 15px;
+  background-attachment: local;
 }
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--faint);
+  color: rgba(122, 101, 71, 0.75);
+  font-style: italic;
 }
 
 .error-banner {
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: rgba(242, 119, 122, 0.12);
-  border: 1px solid rgba(242, 119, 122, 0.4);
-  color: #ffc9ca;
-  font-size: 14px;
+  background: rgba(143, 34, 34, 0.1);
+  border: 1px solid rgba(143, 34, 34, 0.45);
+  border-left: 4px solid var(--blood);
+  color: #6d1a1a;
+  font-size: 15px;
 }
 
 /* ---------- Barra de héroe ---------- */
 
+/* Correa de cuero claveteada sobre la que cuelga el pergamino. */
 .herobar {
   position: sticky;
   top: 0;
   z-index: 20;
-  backdrop-filter: blur(14px);
-  background: rgba(7, 8, 17, 0.78);
-  border-bottom: 1px solid var(--border);
+  background-color: var(--leather-2);
+  /* El velo oscuro va encima del damasco: si no, el tapiz compite con el texto. */
+  background-image:
+    linear-gradient(180deg, rgba(43, 31, 19, 0.86), rgba(23, 17, 10, 0.9) 55%, rgba(34, 24, 9, 0.87)),
+    var(--art-diaper),
+    linear-gradient(180deg, #2b1f13, #17110a 55%, #221809);
+  background-size: auto, 80px 80px, auto;
+  border-bottom: 1px solid #060403;
+  box-shadow:
+    inset 0 1px 0 rgba(214, 172, 112, 0.18),
+    0 2px 0 rgba(201, 162, 74, 0.4),
+    0 12px 26px rgba(0, 0, 0, 0.55);
 }
 
 .herobar-inner {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: 9px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
+/* La gótica dibuja por encima de su caja: el relleno vertical evita que la
+   barra le corte las astas altas. */
 .brand {
-  font-family: var(--serif);
-  font-size: 19px;
-  font-weight: 700;
+  display: inline-block;
+  font-family: var(--gothic);
+  font-size: 23px;
+  font-weight: 400;
   letter-spacing: 0.02em;
-  color: var(--gold);
+  line-height: 1.05;
+  padding: 10px 0 5px;
+  color: var(--gilt-hi);
   text-decoration: none;
   white-space: nowrap;
+  text-shadow: 0 1px 0 #000, 0 0 14px rgba(201, 162, 74, 0.35);
 }
 
 .hero-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   flex: 1;
   min-width: 0;
 }
@@ -286,30 +482,41 @@ a {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 12.5px;
+  color: #a8977a;
 }
 
 .hero-title {
-  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cream);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.herobar .faint {
+  color: #8d7c5f;
+}
+
+/* Cadena de progreso engastada en hierro. */
 .xpbar {
-  height: 6px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.09);
+  height: 8px;
+  border-radius: 1px;
+  background: #100b06;
+  border: 1px solid rgba(201, 162, 74, 0.3);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
   overflow: hidden;
 }
 
 .xpbar > span {
   display: block;
   height: 100%;
-  border-radius: 99px;
-  background: linear-gradient(90deg, #d09b43, #f3d79b);
+  background: linear-gradient(180deg, #f4dfa1, #c9a24a 55%, #8f6a1c);
+  box-shadow: 0 0 10px rgba(201, 162, 74, 0.55);
   transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -319,40 +526,89 @@ a {
   gap: 4px;
 }
 
+.herobar .btn-ghost {
+  color: var(--cream);
+  font-size: 14px;
+}
+
+.herobar .btn-ghost:hover:not(:disabled) {
+  background: rgba(201, 162, 74, 0.16);
+  color: var(--gilt-hi);
+}
+
 .streak {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
-  border-radius: 99px;
-  background: rgba(240, 185, 91, 0.14);
-  border: 1px solid rgba(240, 185, 91, 0.3);
+  padding: 3px 10px;
+  border-radius: 1px;
+  background: rgba(184, 64, 47, 0.2);
+  border: 1px solid rgba(201, 162, 74, 0.4);
+  font-family: var(--serif);
   font-size: 12px;
-  font-weight: 600;
-  color: var(--warn);
+  font-weight: 700;
+  color: #f0c07a;
   white-space: nowrap;
 }
 
-/* ---------- Login ---------- */
+/* ---------- Puerta de entrada ---------- */
 
 .auth-shell {
+  position: relative;
+  z-index: 1;
   min-height: 100%;
   display: grid;
   place-items: center;
-  padding: 32px 20px;
+  padding: 40px 20px;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 430px;
-  padding: 34px;
+  max-width: 450px;
+  padding: 38px 34px;
+  background-color: var(--parchment);
+  background-image:
+    var(--art-emblem-faint),
+    var(--art-fiber),
+    linear-gradient(168deg, #f4ebd2, #e9dcbc 55%, #dccaa2);
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-size: 240px 240px, 260px 260px, auto;
+  background-position: right -50px bottom -40px, 0 0, 0 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 252, 242, 0.5),
+    inset 0 0 60px rgba(120, 78, 26, 0.28),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* Doble filete de escribano alrededor de la carta. */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(143, 34, 34, 0.3);
+  box-shadow: inset 0 0 0 3px rgba(255, 252, 242, 0.3), inset 0 0 0 4px rgba(90, 62, 26, 0.18);
+  pointer-events: none;
 }
 
 .auth-logo {
-  font-family: var(--serif);
-  font-size: 40px;
-  letter-spacing: -0.02em;
-  color: var(--gold);
+  font-family: var(--gothic);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  background: linear-gradient(180deg, #d8b467, #8a6a1e 60%, #6b4f11);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.auth-logo::after {
+  content: '';
+  display: block;
+  height: 18px;
+  margin-top: 8px;
+  background: var(--art-rule) no-repeat left center;
+  background-size: 190px 18px;
 }
 
 .auth-tabs {
@@ -360,36 +616,42 @@ a {
   gap: 4px;
   padding: 4px;
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border);
+  background: rgba(90, 62, 26, 0.12);
+  border: 1px solid var(--edge);
 }
 
 .auth-tabs button {
   flex: 1;
   padding: 9px;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 1px;
+  font-family: var(--serif);
+  font-size: 12.5px;
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--muted);
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .auth-tabs button[data-active='true'] {
-  background: rgba(255, 255, 255, 0.09);
+  background: linear-gradient(180deg, #f6eed8, #e5d6b2);
+  border: 1px solid var(--edge);
   color: var(--ink);
+  box-shadow: 0 1px 0 rgba(70, 46, 18, 0.2);
 }
 
-/* ---------- Selección de nivel ---------- */
+/* ---------- Elección de acto ---------- */
 
 .level-grid {
   display: grid;
-  gap: 16px;
+  gap: 18px;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
+/* Carta sellada: banda heráldica arriba, escudo del acto y esquina doblada. */
 .level-card {
   position: relative;
-  padding: 22px;
+  padding: 26px 22px 22px;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -401,18 +663,30 @@ a {
 .level-card::before {
   content: '';
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
+  inset: 0 0 auto 0;
+  height: 6px;
   background: var(--accent);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.level-card::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, transparent 50%, rgba(120, 85, 35, 0.32) 50%);
 }
 
 .level-card:not(.is-locked):hover {
   transform: translateY(-3px);
-  border-color: var(--border-strong);
+  border-color: var(--accent);
 }
 
 .level-card.is-locked {
-  opacity: 0.62;
+  filter: grayscale(0.45);
+  opacity: 0.7;
 }
 
 .level-head {
@@ -422,17 +696,31 @@ a {
   gap: 12px;
 }
 
+/* Escudo con la divisa del acto. */
 .level-sigil {
+  flex: none;
+  width: 46px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  padding-bottom: 6px;
   font-size: 26px;
   line-height: 1;
-  color: var(--accent);
+  color: var(--parchment-hi);
+  background: var(--accent);
+  clip-path: polygon(50% 100%, 100% 70%, 100% 0, 0 0, 0 70%);
+  /* Los símbolos heráldicos son de trazo fino: engordarlos los hace legibles. */
+  -webkit-text-stroke: 0.6px currentColor;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .level-code {
   font-family: var(--serif);
-  font-size: 28px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: var(--accent);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .chip-row {
@@ -442,10 +730,11 @@ a {
 }
 
 .chip {
-  padding: 3px 9px;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 10px;
+  border-radius: 1px;
+  border: 1px solid var(--edge);
+  background: rgba(120, 85, 35, 0.08);
+  font-family: var(--sans);
   font-size: 11.5px;
   color: var(--muted);
 }
@@ -454,22 +743,25 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
+  font-family: var(--serif);
   font-size: 12px;
   color: var(--muted);
 }
 
 .progress-track {
   flex: 1;
-  height: 5px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.09);
+  height: 8px;
+  border-radius: 1px;
+  background: rgba(60, 38, 12, 0.22);
+  border: 1px solid var(--edge);
+  box-shadow: inset 0 1px 3px rgba(60, 38, 12, 0.35);
   overflow: hidden;
 }
 
 .progress-track > span {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--accent, var(--gold));
   transition: width 0.4s ease;
 }
 
@@ -480,9 +772,9 @@ a {
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px dashed var(--border-strong);
-  font-size: 12.5px;
+  background: rgba(90, 62, 26, 0.1);
+  border: 1px dashed var(--edge-strong);
+  font-size: 13.5px;
   color: var(--muted);
 }
 
@@ -506,32 +798,42 @@ a {
 
 .chapter-card:not(.is-locked):hover {
   transform: translateX(3px);
-  border-color: var(--border-strong);
+  border-color: var(--gold);
 }
 
 .chapter-card.is-locked {
-  opacity: 0.5;
+  opacity: 0.62;
+  filter: grayscale(0.5);
   cursor: not-allowed;
 }
 
+/* Sello de lacre con el número del capítulo. */
 .chapter-index {
   flex: none;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  border: 1px solid var(--border-strong);
-  background: rgba(0, 0, 0, 0.3);
+  border-radius: 47% 53% 50% 50% / 52% 48% 53% 47%;
+  background: radial-gradient(circle at 34% 28%, #b8402f, #8f2222 55%, #5f150f);
+  border: none;
   font-family: var(--serif);
-  font-size: 18px;
-  color: var(--gold);
+  font-size: 17px;
+  font-weight: 700;
+  color: #f2dcae;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 190, 160, 0.3),
+    inset 0 -3px 7px rgba(0, 0, 0, 0.4),
+    0 3px 6px rgba(40, 12, 6, 0.35);
 }
 
 .chapter-card.is-done .chapter-index {
-  background: rgba(94, 196, 168, 0.16);
-  border-color: rgba(94, 196, 168, 0.5);
-  color: var(--good);
+  background: radial-gradient(circle at 34% 28%, #5c8f4a, #3f6b34 55%, #22421c);
+}
+
+.chapter-card.is-locked .chapter-index {
+  background: radial-gradient(circle at 34% 28%, #6d6a63, #46443f 55%, #26241f);
 }
 
 .goal-list {
@@ -544,17 +846,18 @@ a {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  font-size: 13.5px;
+  font-size: 14.5px;
   color: var(--muted);
 }
 
 .goal-mark {
   flex: none;
-  width: 17px;
-  height: 17px;
-  margin-top: 2px;
-  border-radius: 5px;
-  border: 1px solid var(--border-strong);
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  border-radius: 1px;
+  border: 1px solid var(--edge-strong);
+  background: rgba(90, 62, 26, 0.08);
   display: grid;
   place-items: center;
   font-size: 11px;
@@ -566,9 +869,9 @@ a {
 }
 
 .goal.is-met .goal-mark {
-  background: rgba(94, 196, 168, 0.2);
-  border-color: var(--good);
-  color: var(--good);
+  background: rgba(63, 107, 52, 0.18);
+  border-color: var(--forest);
+  color: var(--forest);
 }
 
 /* ---------- Escena ---------- */
@@ -581,45 +884,78 @@ a {
 
 .scene-progress > span {
   flex: 1;
-  height: 3px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 5px;
+  border-radius: 1px;
+  background: rgba(60, 38, 12, 0.2);
+  border: 1px solid rgba(74, 48, 16, 0.2);
 }
 
 .scene-progress > span[data-state='done'] {
-  background: var(--gold-dim);
+  background: var(--gold);
+  border-color: var(--gold);
 }
 
 .scene-progress > span[data-state='current'] {
-  background: var(--gold);
-  box-shadow: 0 0 10px rgba(229, 183, 106, 0.6);
+  background: linear-gradient(180deg, #f0d68f, #c9a24a);
+  border-color: #8a6a1e;
+  box-shadow: 0 0 8px rgba(201, 162, 74, 0.8);
 }
 
+/* Vitela iluminada: la voz de la historia. */
 .parchment {
   position: relative;
-  padding: 26px 28px;
+  padding: 30px 32px;
   border-radius: var(--radius);
-  background: linear-gradient(180deg, #f7eeda, var(--parchment));
-  color: var(--parchment-ink);
-  font-family: var(--serif);
-  font-size: 18.5px;
-  line-height: 1.7;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: #fdf9ef;
+  background-image:
+    var(--art-fiber),
+    radial-gradient(40% 30% at 88% 12%, rgba(150, 108, 46, 0.14), transparent 70%),
+    linear-gradient(168deg, #fffcf4, #faf3e2 55%, #f2e8cf);
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-size: 260px 260px, auto, auto;
+  color: var(--ink);
+  font-family: var(--prose);
+  font-size: 19.5px;
+  line-height: 1.72;
+  border: 1px solid var(--edge-strong);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 252, 0.8),
+    inset 0 0 30px rgba(150, 108, 46, 0.12),
+    0 16px 34px rgba(30, 18, 6, 0.28);
+}
+
+.parchment::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(143, 34, 34, 0.28);
+  pointer-events: none;
+}
+
+/* Capital iluminada en rojo de minio. */
+.parchment > p:first-of-type::first-letter {
+  float: left;
+  margin: 6px 10px 0 0;
+  font-family: var(--gothic);
+  font-size: 2.9em;
+  line-height: 0.8;
+  color: var(--blood);
+  text-shadow: 1px 1px 0 rgba(201, 162, 74, 0.45);
 }
 
 .parchment .speaker {
   display: inline-block;
-  margin-bottom: 10px;
-  padding: 2px 10px;
-  border-radius: 99px;
-  background: rgba(47, 39, 24, 0.1);
-  border: 1px solid var(--parchment-line);
-  font-family: var(--sans);
+  margin-bottom: 12px;
+  padding: 2px 12px;
+  border-radius: 1px;
+  background: rgba(143, 34, 34, 0.1);
+  border: 1px solid rgba(143, 34, 34, 0.35);
+  font-family: var(--serif);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--blood);
 }
 
 .gloss {
@@ -628,52 +964,59 @@ a {
   padding: 0;
   font: inherit;
   color: inherit;
-  border-bottom: 1.5px dotted rgba(47, 39, 24, 0.45);
+  border-bottom: 1.5px dotted rgba(143, 34, 34, 0.55);
   cursor: help;
 }
 
 .gloss:hover,
 .gloss[data-open='true'] {
-  background: rgba(229, 183, 106, 0.35);
+  background: rgba(201, 162, 74, 0.42);
   border-bottom-color: transparent;
 }
 
 .gloss-bubble {
   display: inline-block;
   margin-left: 6px;
-  padding: 1px 8px;
-  border-radius: 99px;
-  background: rgba(47, 39, 24, 0.86);
-  color: var(--parchment);
+  padding: 1px 9px;
+  border-radius: 1px;
+  background: var(--leather);
+  border: 1px solid rgba(201, 162, 74, 0.5);
+  color: var(--cream);
   font-family: var(--sans);
   font-size: 12.5px;
   vertical-align: middle;
 }
 
 .translation {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--parchment-line);
-  font-family: var(--sans);
-  font-size: 14.5px;
-  color: rgba(47, 39, 24, 0.78);
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--prose);
+  font-style: italic;
+  font-size: 16.5px;
+  color: var(--muted);
 }
 
+/* Encargo del escriba. */
 .prompt-block {
-  padding: 18px 20px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.03);
+  position: relative;
+  padding: 18px 20px 18px 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--edge);
+  border-left: 4px solid var(--gold);
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.7), rgba(215, 192, 150, 0.28));
 }
 
 .prompt-en {
-  font-family: var(--serif);
-  font-size: 17.5px;
+  font-family: var(--prose);
+  font-size: 19px;
+  line-height: 1.6;
 }
 
 .prompt-es {
   margin-top: 8px;
-  font-size: 14px;
+  font-size: 15px;
+  font-style: italic;
   color: var(--muted);
 }
 
@@ -684,54 +1027,104 @@ a {
 }
 
 .option {
-  padding: 14px 16px;
+  position: relative;
+  padding: 14px 16px 14px 42px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--edge-strong);
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.62), rgba(215, 192, 150, 0.3));
+  font-family: var(--prose);
+  font-size: 17px;
+  color: var(--ink);
   text-align: left;
   transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
 }
 
+/* Losange de bronce a modo de viñeta. */
+.option::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  transform: rotate(45deg);
+  border: 1px solid var(--edge-strong);
+  background: rgba(201, 162, 74, 0.45);
+}
+
 .option:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 253, 246, 0.85), rgba(224, 203, 162, 0.4));
+  border-color: var(--gold);
   transform: translateX(3px);
 }
 
 .option[data-state='correct'] {
-  border-color: var(--good);
-  background: rgba(94, 196, 168, 0.14);
+  border-color: var(--forest);
+  background: rgba(63, 107, 52, 0.14);
+}
+
+.option[data-state='correct']::before {
+  background: var(--forest);
+  border-color: var(--forest);
 }
 
 .option[data-state='incorrect'] {
-  border-color: var(--bad);
-  background: rgba(242, 119, 122, 0.12);
+  border-color: var(--blood);
+  background: rgba(143, 34, 34, 0.1);
+}
+
+.option[data-state='incorrect']::before {
+  background: var(--blood);
+  border-color: var(--blood);
 }
 
 .option[data-state='muted'] {
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
+/* Anotación al margen del maestro de armas. */
 .feedback {
   padding: 14px 16px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 14.5px;
+  border: 1px solid var(--edge);
+  border-left: 4px solid var(--muted);
+  background: rgba(255, 252, 242, 0.55);
+  font-size: 16px;
+}
+
+.feedback > strong:first-child {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .feedback[data-grade='perfect'] {
-  border-color: rgba(94, 196, 168, 0.5);
-  background: rgba(94, 196, 168, 0.1);
+  border-left-color: var(--forest);
+  background: rgba(63, 107, 52, 0.1);
+}
+
+.feedback[data-grade='perfect'] > strong:first-child {
+  color: var(--forest);
 }
 
 .feedback[data-grade='close'] {
-  border-color: rgba(240, 185, 91, 0.5);
-  background: rgba(240, 185, 91, 0.1);
+  border-left-color: var(--ochre);
+  background: rgba(151, 112, 26, 0.1);
+}
+
+.feedback[data-grade='close'] > strong:first-child {
+  color: var(--ochre);
 }
 
 .feedback[data-grade='wrong'] {
-  border-color: rgba(242, 119, 122, 0.45);
-  background: rgba(242, 119, 122, 0.09);
+  border-left-color: var(--blood);
+  background: rgba(143, 34, 34, 0.08);
+}
+
+.feedback[data-grade='wrong'] > strong:first-child {
+  color: var(--blood);
 }
 
 .feedback ul {
@@ -746,10 +1139,19 @@ a {
 .hint-box {
   padding: 12px 14px;
   border-radius: var(--radius-sm);
-  border: 1px dashed rgba(240, 185, 91, 0.45);
-  background: rgba(240, 185, 91, 0.07);
-  font-size: 14px;
-  color: #f5d79f;
+  border: 1px dashed rgba(151, 112, 26, 0.6);
+  background: rgba(201, 162, 74, 0.12);
+  font-size: 15.5px;
+  font-style: italic;
+  color: #6b4f11;
+}
+
+.hint-box strong {
+  font-family: var(--serif);
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12.5px;
 }
 
 .checklist {
@@ -763,12 +1165,12 @@ a {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 13.5px;
+  font-size: 14.5px;
   color: var(--muted);
 }
 
 .check-item[data-met='true'] {
-  color: var(--good);
+  color: var(--forest);
 }
 
 .check-item[data-met='false'] {
@@ -780,6 +1182,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  font-family: var(--sans);
   font-size: 12.5px;
   color: var(--faint);
 }
@@ -789,17 +1192,18 @@ a {
   align-items: center;
   gap: 5px;
   padding: 3px 10px;
-  border-radius: 99px;
-  background: rgba(229, 183, 106, 0.16);
-  border: 1px solid rgba(229, 183, 106, 0.36);
-  color: var(--gold);
+  border-radius: 1px;
+  background: rgba(143, 34, 34, 0.12);
+  border: 1px solid rgba(143, 34, 34, 0.4);
+  color: var(--blood);
+  font-family: var(--serif);
   font-weight: 700;
   font-size: 12px;
 }
 
 .xp-float {
   animation: floatUp 1.4s ease forwards;
-  color: var(--gold);
+  color: #2a1c05;
   font-weight: 700;
 }
 
@@ -818,18 +1222,40 @@ a {
   }
 }
 
-/* ---------- Resumen de capítulo ---------- */
+/* ---------- Crónica del capítulo ---------- */
 
 .summary-hero {
+  position: relative;
   text-align: center;
-  padding: 36px 26px;
+  padding: 40px 26px;
+  background-image:
+    var(--art-emblem-faint),
+    var(--art-fiber),
+    linear-gradient(168deg, #f9f2df, #efe4c8 55%, #e2d2ad);
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-position: center center, 0 0, 0 0;
+  background-size: 260px 260px, 260px 260px, auto;
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 252, 242, 0.6),
+    inset 0 0 0 5px rgba(201, 162, 74, 0.28),
+    inset 0 0 40px rgba(150, 108, 46, 0.18),
+    var(--shadow);
+}
+
+.summary-hero h1::after {
+  margin-inline: auto;
 }
 
 .summary-xp {
   font-family: var(--serif);
-  font-size: 56px;
-  line-height: 1;
-  color: var(--gold);
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #e5c579, #a97a1c 60%, #7a560d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .stat-grid {
@@ -839,28 +1265,31 @@ a {
 }
 
 .stat {
-  padding: 14px;
+  padding: 14px 10px;
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.26);
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.65), rgba(215, 192, 150, 0.32));
+  border: 1px solid var(--edge-strong);
+  box-shadow: inset 0 0 0 1px rgba(255, 252, 242, 0.5);
   text-align: center;
 }
 
 .stat b {
   display: block;
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: 25px;
+  font-weight: 700;
   color: var(--ink);
 }
 
 .stat span {
-  font-size: 11.5px;
-  color: var(--faint);
+  font-family: var(--serif);
+  font-size: 10.5px;
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
 }
 
-/* ---------- Logros ---------- */
+/* ---------- Salón de trofeos ---------- */
 
 .achievement-grid {
   display: grid;
@@ -876,27 +1305,28 @@ a {
 }
 
 .achievement.is-locked {
-  opacity: 0.45;
+  opacity: 0.55;
+  filter: grayscale(0.6);
 }
 
+/* Escudete del trofeo. */
 .achievement-sigil {
   flex: none;
   width: 40px;
-  height: 40px;
+  height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-strong);
-  font-size: 19px;
+  padding-bottom: 5px;
+  background: linear-gradient(180deg, #6d6a63, #3b3934);
+  clip-path: polygon(50% 100%, 100% 70%, 100% 0, 0 0, 0 70%);
+  font-size: 18px;
 }
 
 .achievement.is-unlocked .achievement-sigil {
-  background: rgba(229, 183, 106, 0.16);
-  border-color: rgba(229, 183, 106, 0.45);
+  background: linear-gradient(180deg, #e0bd6f, #9c7420);
 }
 
-/* ---------- Aviso de logro ---------- */
+/* ---------- Pregón de logro ---------- */
 
 .toast-stack {
   position: fixed;
@@ -909,15 +1339,40 @@ a {
   max-width: min(340px, calc(100vw - 36px));
 }
 
+/* Tablilla de madera claveteada. */
 .toast {
   display: flex;
   gap: 12px;
   padding: 14px 16px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(229, 183, 106, 0.45);
-  background: linear-gradient(180deg, #241f2f, #171325);
-  box-shadow: var(--shadow);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(201, 162, 74, 0.55);
+  background:
+    linear-gradient(180deg, #33251588, transparent),
+    linear-gradient(180deg, #2b1f13, #17110a);
+  color: var(--cream);
+  text-align: left;
+  box-shadow:
+    inset 0 1px 0 rgba(214, 172, 112, 0.25),
+    0 14px 30px rgba(0, 0, 0, 0.6);
   animation: toastIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.toast .eyebrow {
+  color: var(--gilt);
+}
+
+.toast strong {
+  font-family: var(--serif);
+  color: var(--gilt-hi);
+}
+
+.toast .muted {
+  color: #a8977a;
+}
+
+.toast-stack > .faint {
+  color: #8d7c5f;
+  text-shadow: 0 1px 2px #000;
 }
 
 @keyframes toastIn {
@@ -929,18 +1384,44 @@ a {
 
 /* ---------- Responsive ---------- */
 
-@media (max-width: 640px) {
+/* Sin hueco a los lados, los varales sobresaldrían del viewport. */
+@media (max-width: 960px) {
+  .page::before,
+  .page::after {
+    left: 0;
+    right: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  body::after {
+    background-position: left -140px top 60px, right -140px top 60px, center bottom -20px;
+    background-size: 260px 260px, 260px 260px, 340px 180px;
+  }
+
   .page {
-    padding: 20px 15px 80px;
+    padding: 40px 20px 88px;
+    min-height: calc(100vh - 54px);
+  }
+
+  .page::before,
+  .page::after {
+    height: 16px;
+  }
+
+  .page h1::after,
+  .auth-logo::after {
+    background-size: 150px 14px;
+    height: 14px;
   }
 
   .herobar-inner {
-    padding: 9px 15px;
+    padding: 8px 15px;
     gap: 10px;
   }
 
   .brand {
-    font-size: 16px;
+    font-size: 21px;
   }
 
   /* El título de héroe se recorta con elipsis; la XP nunca parte en dos líneas. */
@@ -953,12 +1434,16 @@ a {
   }
 
   .parchment {
-    padding: 20px 18px;
-    font-size: 17px;
+    padding: 22px 18px;
+    font-size: 17.5px;
   }
 
   .auth-card {
-    padding: 26px 22px;
+    padding: 30px 24px;
+  }
+
+  .auth-logo {
+    font-size: 42px;
   }
 
   .level-grid {
@@ -966,7 +1451,7 @@ a {
   }
 
   .summary-xp {
-    font-size: 44px;
+    font-size: 46px;
   }
 
   .toast-stack {

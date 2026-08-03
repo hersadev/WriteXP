@@ -15,8 +15,8 @@ export const LEVELS: LevelDef[] = [
     vocabFocus: ['Objetos cotidianos', 'Colores y números', 'Familia', 'La casa y el pueblo'],
     grammarFocus: ['verbo to be', 'a / an / the', 'Presente simple', 'Plurales'],
     recommendedHeroLevel: 1,
-    accent: '#5ec4a8',
-    sigil: '🜁',
+    accent: '#3f6b34',
+    sigil: '\u269C',
   },
   {
     id: 'A2',
@@ -28,8 +28,8 @@ export const LEVELS: LevelDef[] = [
     vocabFocus: ['Rutinas', 'Ropa y aspecto', 'Comida', 'Viajes y direcciones'],
     grammarFocus: ['Pasado simple', 'there was / there were', 'Comparativos', 'Preguntas con wh-'],
     recommendedHeroLevel: 3,
-    accent: '#66a6ff',
-    sigil: '🜂',
+    accent: '#2b5480',
+    sigil: '\u2691\uFE0E',
   },
   {
     id: 'B1',
@@ -41,8 +41,8 @@ export const LEVELS: LevelDef[] = [
     vocabFocus: ['Trabajo y estudios', 'Tecnología', 'Medio ambiente', 'Emociones'],
     grammarFocus: ['Presente perfecto', 'Condicionales 1 y 2', 'Conectores', 'Voz pasiva básica'],
     recommendedHeroLevel: 6,
-    accent: '#b98cff',
-    sigil: '🜃',
+    accent: '#5b3570',
+    sigil: '\u2694\uFE0E',
   },
   {
     id: 'B2',
@@ -54,8 +54,8 @@ export const LEVELS: LevelDef[] = [
     vocabFocus: ['Política y sociedad', 'Ciencia', 'Cultura y arte', 'Colocaciones formales'],
     grammarFocus: ['Estilo indirecto', 'Condicional 3', 'Inversión', 'Cláusulas de relativo'],
     recommendedHeroLevel: 8,
-    accent: '#ffb454',
-    sigil: '🜄',
+    accent: '#7a3c0c',
+    sigil: '\u265B',
   },
 ];
 

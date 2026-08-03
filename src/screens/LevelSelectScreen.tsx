@@ -51,7 +51,7 @@ export function LevelSelectScreen() {
                     {level.tagline}
                   </span>
                 </div>
-                <span className="level-sigil">{finished ? '👑' : level.sigil}</span>
+                <span className="level-sigil">{finished ? '♔' : level.sigil}</span>
               </div>
 
               <p className="muted" style={{ fontSize: 14 }}>
