@@ -1382,6 +1382,291 @@ a {
   }
 }
 
+/* ---------- Ascenso de rango ---------- */
+
+/* La cadena de XP se enciende al cerrarse el pregón. Dos latidos de 1,05 s
+   caben de sobra en los 2,6 s de `AFTERGLOW_MS`: así no se corta a medias. */
+.herobar.is-levelup .xpbar {
+  border-color: var(--gilt-hi);
+  animation: heroChainPulse 1.05s ease-in-out 2;
+}
+
+.herobar.is-levelup .hero-title {
+  color: var(--gilt-hi);
+  text-shadow: 0 0 12px rgba(240, 214, 143, 0.75);
+}
+
+@keyframes heroChainPulse {
+  50% {
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.9),
+      0 0 18px rgba(240, 214, 143, 0.9);
+  }
+}
+
+.levelup {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 46%, rgba(72, 48, 14, 0.5), rgba(4, 3, 2, 0.88) 68%);
+  animation: levelupVeil 0.4s ease both;
+}
+
+@keyframes levelupVeil {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Gloria de rayos dorados tras el sello: gira despacio y entra abriéndose. */
+.levelup-rays {
+  position: absolute;
+  width: min(160vw, 1200px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(240, 214, 143, 0.3) 0deg 5deg,
+    transparent 5deg 17deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 10%, transparent 62%);
+  mask-image: radial-gradient(circle, #000 10%, transparent 62%);
+  animation:
+    levelupSpin 26s linear infinite,
+    levelupBloom 1s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+/* `rotate` y `scale` son propiedades independientes: pueden animarse a la vez
+   sin que una pise a la otra, cosa que con `transform` no pasaría. */
+@keyframes levelupSpin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes levelupBloom {
+  from {
+    scale: 0.15;
+    opacity: 0;
+  }
+}
+
+.levelup-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Escamas de pan de oro despedidas desde el centro, en dos ráfagas. */
+.levelup-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2);
+  rotate: 45deg;
+  background: linear-gradient(180deg, var(--gilt-hi), var(--gilt));
+  box-shadow: 0 0 10px rgba(201, 162, 74, 0.85);
+  animation: levelupSpark 1.45s ease-out var(--delay) 2 both;
+}
+
+@keyframes levelupSpark {
+  0% {
+    translate: 0 0;
+    scale: 0.2;
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    translate: var(--x) var(--y);
+    scale: 1.15;
+    opacity: 0;
+  }
+}
+
+/* La placa cae como un sello de lacre al ser prensado. */
+.levelup-plaque {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  width: min(400px, 100%);
+  padding: 32px 34px 28px;
+  overflow: hidden;
+  text-align: center;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background-color: var(--parchment);
+  background-image:
+    var(--art-emblem-faint),
+    var(--art-fiber),
+    linear-gradient(168deg, #f9f2df, #efe4c8 55%, #e2d2ad);
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-position: center center, 0 0, 0 0;
+  background-size: 260px 260px, 260px 260px, auto;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 252, 242, 0.6),
+    inset 0 0 0 5px rgba(201, 162, 74, 0.3),
+    inset 0 0 40px rgba(150, 108, 46, 0.2),
+    0 30px 70px rgba(0, 0, 0, 0.65);
+  animation: levelupStamp 0.55s cubic-bezier(0.2, 0.9, 0.28, 1.3) both;
+}
+
+@keyframes levelupStamp {
+  from {
+    scale: 1.55;
+    opacity: 0;
+    filter: blur(7px);
+  }
+}
+
+/* Doble filete de escribano. */
+.levelup-plaque::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(143, 34, 34, 0.3);
+  pointer-events: none;
+}
+
+/* Destello que barre el pergamino, dos pasadas. */
+.levelup-plaque::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 250, 232, 0.7) 50%, transparent 62%);
+  animation: levelupShine 1.5s ease-in-out 0.45s 2 both;
+}
+
+@keyframes levelupShine {
+  from {
+    translate: -130% 0;
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    translate: 130% 0;
+    opacity: 0;
+  }
+}
+
+/* Escudo de bronce con el rango nuevo. */
+.levelup-seal {
+  width: 82px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  padding-bottom: 10px;
+  font-family: var(--serif);
+  font-size: 37px;
+  font-weight: 700;
+  line-height: 1;
+  color: #2a1c05;
+  background: linear-gradient(180deg, #f4dc9e, #d9b158 42%, #b4862c 72%, #94691a);
+  clip-path: polygon(50% 100%, 100% 70%, 100% 0, 0 0, 0 70%);
+  text-shadow: 0 1px 0 rgba(255, 246, 216, 0.65);
+  /* Con `clip-path` la sombra de caja se recorta: el halo va con drop-shadow. */
+  animation:
+    levelupSealPop 0.65s cubic-bezier(0.2, 0.9, 0.28, 1.5) 0.12s both,
+    levelupSealGlow 2.2s ease-in-out 0.8s infinite;
+}
+
+@keyframes levelupSealPop {
+  from {
+    scale: 0;
+    rotate: -20deg;
+  }
+}
+
+@keyframes levelupSealGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(201, 162, 74, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(240, 214, 143, 0.95));
+  }
+}
+
+/* Cada línea del texto entra escalonada con su propio retardo. */
+.levelup-line {
+  animation: levelupRise 0.45s ease var(--d, 0s) both;
+}
+
+@keyframes levelupRise {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+.levelup-name {
+  font-family: var(--serif);
+  font-size: 29px;
+  line-height: 1.15;
+  background: linear-gradient(180deg, #e5c579, #a97a1c 60%, #7a560d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.levelup-rank {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.levelup-plaque .btn {
+  margin-top: 8px;
+}
+
+/* Divisa del ascenso en la crónica del capítulo. */
+.levelup-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: center;
+  padding: 7px 16px 7px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gold);
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.8), rgba(215, 192, 150, 0.42));
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b4f11;
+  animation: levelupRise 0.5s ease 0.15s both;
+}
+
+.levelup-banner-seal {
+  flex: none;
+  width: 26px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding-bottom: 3px;
+  font-size: 14px;
+  color: #2a1c05;
+  background: linear-gradient(180deg, #f4dc9e, #d9b158 42%, #b4862c 72%, #94691a);
+  clip-path: polygon(50% 100%, 100% 70%, 100% 0, 0 0, 0 70%);
+}
+
 /* ---------- Responsive ---------- */
 
 /* Sin hueco a los lados, los varales sobresaldrían del viewport. */
@@ -1459,11 +1744,33 @@ a {
     right: 15px;
     max-width: none;
   }
+
+  .levelup-plaque {
+    padding: 26px 22px 24px;
+  }
+
+  .levelup-seal {
+    width: 70px;
+    height: 78px;
+    font-size: 32px;
+  }
+
+  .levelup-name {
+    font-size: 25px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Los adornos en movimiento del pregón se retiran del todo: acelerados a
+     0,01 ms no serían un guiño discreto, sino un parpadeo continuo. */
+  .levelup-rays,
+  .levelup-sparks,
+  .levelup-plaque::after {
+    display: none;
   }
 }
