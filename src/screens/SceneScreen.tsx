@@ -7,6 +7,7 @@ import { levelById } from '@/data/levels';
 import { chapterById, chaptersByLevel } from '@/data/story';
 import type { AnswerRecord, ChapterOutcome, RunStats } from '@/engine/progress';
 import { emptyRunStats } from '@/engine/progress';
+import { heroTitle } from '@/engine/xp';
 import { useGame } from '@/state/GameContext';
 import type { ChoiceNode, NarrativeNode, WritingNode } from '@/types';
 
@@ -125,9 +126,10 @@ function ChapterSummary({
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: 27 }}>{chapter.title}</h1>
         <div className="summary-xp">+{run.xp + outcome.goalXp} XP</div>
         {outcome.leveledUpTo && (
-          <p style={{ color: 'var(--gold)', fontWeight: 600 }}>
-            ¡Has subido al nivel {outcome.leveledUpTo}!
-          </p>
+          <span className="levelup-banner">
+            <span className="levelup-banner-seal">{outcome.leveledUpTo}</span>
+            Ascendido a {heroTitle(outcome.leveledUpTo)}
+          </span>
         )}
       </div>
 

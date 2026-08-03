@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AchievementToasts } from '@/components/AchievementToasts';
 import { HeroBar } from '@/components/HeroBar';
+import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { AchievementsScreen } from '@/screens/AchievementsScreen';
 import { ChapterMapScreen } from '@/screens/ChapterMapScreen';
 import { LevelSelectScreen } from '@/screens/LevelSelectScreen';
@@ -28,6 +29,7 @@ function RequireAuth({ children }: { children: ReactElement }) {
       <HeroBar />
       {children}
       <AchievementToasts />
+      <LevelUpCelebration />
     </>
   );
 }

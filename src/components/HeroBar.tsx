@@ -1,16 +1,38 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/state/AuthContext';
 import { useGame } from '@/state/GameContext';
 
+/** Cuánto sigue encendida la cadena de XP después de cerrarse el pregón. */
+const AFTERGLOW_MS = 2600;
+
 export function HeroBar() {
   const { user, signOut } = useAuth();
-  const { hero, progress } = useGame();
+  const { hero, progress, levelUp } = useGame();
   const navigate = useNavigate();
+
+  // La cadena se enciende al *cerrarse* el pregón, no mientras se muestra: el
+  // velo del aviso tapa la barra, y encenderla debajo no la vería nadie.
+  const [afterglow, setAfterglow] = useState(false);
+  const announced = useRef(false);
+  const eventId = levelUp?.id ?? null;
+
+  useEffect(() => {
+    if (eventId !== null) {
+      announced.current = true;
+      return;
+    }
+    if (!announced.current) return;
+    announced.current = false;
+    setAfterglow(true);
+    const timer = window.setTimeout(() => setAfterglow(false), AFTERGLOW_MS);
+    return () => window.clearTimeout(timer);
+  }, [eventId]);
 
   if (!user) return null;
 
   return (
-    <header className="herobar">
+    <header className={afterglow ? 'herobar is-levelup' : 'herobar'}>
       <div className="herobar-inner">
         <Link to="/levels" className="brand">
           WriteXP
