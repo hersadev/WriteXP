@@ -9,7 +9,23 @@ import type { AnswerRecord, ChapterOutcome, RunStats } from '@/engine/progress';
 import { emptyRunStats } from '@/engine/progress';
 import { heroTitle } from '@/engine/xp';
 import { useGame } from '@/state/GameContext';
-import type { ChoiceNode, NarrativeNode, WritingNode } from '@/types';
+import type { Chapter, ChoiceNode, NarrativeNode, Progress, WritingNode } from '@/types';
+
+/**
+ * Punto de reanudación: nodo y stats de la partida, siempre juntos. Restaurar
+ * sólo el índice dejaría el `run` a cero y volvería inalcanzables los objetivos
+ * del capítulo (palabras escritas, aciertos a la primera, racha).
+ */
+function resumePoint(chapter: Chapter | undefined, progress: Progress): { index: number; run: RunStats } {
+  if (!chapter) return { index: 0, run: emptyRunStats() };
+  const state = progress.chapters[chapter.id];
+  // Un capítulo ya terminado se rejuega entero, no se reanuda.
+  if (!state || state.completed) return { index: 0, run: emptyRunStats() };
+  return {
+    index: Math.min(state.nodeIndex, chapter.nodes.length - 1),
+    run: state.run ? { ...state.run } : emptyRunStats(),
+  };
+}
 
 /**
  * La `key` fuerza a remontar la escena al cambiar de capítulo: sin ella, al
@@ -28,13 +44,9 @@ function Scene({ chapterId }: { chapterId: string }) {
   const chapter = chapterById(chapterId);
 
   // Reanuda donde se quedó, salvo que el capítulo ya estuviera terminado.
-  const [index, setIndex] = useState(() => {
-    if (!chapter) return 0;
-    const state = progress.chapters[chapter.id];
-    if (!state || state.completed) return 0;
-    return Math.min(state.nodeIndex, chapter.nodes.length - 1);
-  });
-  const [run, setRun] = useState<RunStats>(emptyRunStats);
+  const [resume] = useState(() => resumePoint(chapter, progress));
+  const [index, setIndex] = useState(resume.index);
+  const [run, setRun] = useState<RunStats>(resume.run);
   const [outcome, setOutcome] = useState<ChapterOutcome | null>(null);
 
   const handleComplete = useCallback(
@@ -48,7 +60,7 @@ function Scene({ chapterId }: { chapterId: string }) {
         setOutcome(finishChapter(chapter, nextRun));
       } else {
         setIndex(nextIndex);
-        checkpoint(chapter.id, nextIndex);
+        checkpoint(chapter.id, nextIndex, nextRun);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     },
@@ -116,7 +128,8 @@ function ChapterSummary({
   const chapter = chapterById(chapterId)!;
   const siblings = chaptersByLevel(chapter.level);
   const next = siblings.find((item) => item.order === chapter.order + 1);
-  const accuracy = run.answered ? Math.round((run.perfect / run.answered) * 100) : 100;
+  // Sin respuestas evaluables no hay precisión: un 100% ahí sería mentira.
+  const accuracy = run.answered ? `${Math.round((run.perfect / run.answered) * 100)}%` : '—';
   const metIds = new Set(outcome.goalsMet.map((goal) => goal.id));
 
   return (
@@ -135,7 +148,7 @@ function ChapterSummary({
 
       <div className="stat-grid">
         <div className="stat">
-          <b>{accuracy}%</b>
+          <b>{accuracy}</b>
           <span>Precisión</span>
         </div>
         <div className="stat">

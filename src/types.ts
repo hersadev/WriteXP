@@ -161,6 +161,23 @@ export interface NodeResult {
 
 export type Grade = 'perfect' | 'close' | 'wrong';
 
+/**
+ * Estadísticas de una partida a un capítulo. Se persisten junto al checkpoint:
+ * si sólo se guardase el nodo en el que se quedó, al reanudar arrancarían a cero
+ * y los objetivos del capítulo (palabras, aciertos, racha) serían inalcanzables.
+ */
+export interface RunStats {
+  answered: number;
+  perfect: number;
+  firstTry: number;
+  reveals: number;
+  hints: number;
+  words: number;
+  combo: number;
+  maxCombo: number;
+  xp: number;
+}
+
 export interface ChapterProgress {
   /** Índice del nodo en el que se quedó (permite reanudar). */
   nodeIndex: number;
@@ -168,6 +185,11 @@ export interface ChapterProgress {
   goalsMet: string[];
   bestAccuracy: number;
   runs: number;
+  /**
+   * Partida en curso. Ausente si el capítulo no se ha empezado, si ya se cerró
+   * o si el guardado es anterior a que esto se persistiera.
+   */
+  run?: RunStats;
 }
 
 export interface Stats {

@@ -1,21 +1,12 @@
 import { ACHIEVEMENTS } from '@/data/achievements';
 import { LEVELS } from '@/data/levels';
 import { chaptersByLevel } from '@/data/story';
-import type { CEFRLevel, Chapter, ChapterGoal, Grade, Progress } from '@/types';
+import type { CEFRLevel, Chapter, ChapterGoal, Grade, Progress, RunStats } from '@/types';
 import { heroLevelFor } from './xp';
 
-/** Estadísticas de una partida a un capítulo, en memoria mientras se juega. */
-export interface RunStats {
-  answered: number;
-  perfect: number;
-  firstTry: number;
-  reveals: number;
-  hints: number;
-  words: number;
-  combo: number;
-  maxCombo: number;
-  xp: number;
-}
+// `RunStats` vive en el modelo de datos porque se persiste con el checkpoint,
+// pero se sigue exportando desde aquí: es donde lo buscan la UI y los scripts.
+export type { RunStats };
 
 export function emptyRunStats(): RunStats {
   return { answered: 0, perfect: 0, firstTry: 0, reveals: 0, hints: 0, words: 0, combo: 0, maxCombo: 0, xp: 0 };
@@ -159,8 +150,13 @@ export function registerAnswer(
   return { progress: next, run: nextRun };
 }
 
-/** Guarda en qué nodo se ha quedado el usuario para poder reanudar. */
-export function saveCheckpoint(progress: Progress, chapterId: string, nodeIndex: number): Progress {
+/** Guarda en qué nodo se ha quedado el usuario, y con qué stats, para poder reanudar. */
+export function saveCheckpoint(
+  progress: Progress,
+  chapterId: string,
+  nodeIndex: number,
+  run: RunStats,
+): Progress {
   const next = clone(progress);
   const existing = next.chapters[chapterId];
   next.chapters[chapterId] = {
@@ -169,6 +165,7 @@ export function saveCheckpoint(progress: Progress, chapterId: string, nodeIndex:
     goalsMet: existing?.goalsMet ?? [],
     bestAccuracy: existing?.bestAccuracy ?? 0,
     runs: existing?.runs ?? 0,
+    run: { ...run },
   };
   return next;
 }
@@ -210,13 +207,19 @@ export function completeChapter(progress: Progress, chapter: Chapter, run: RunSt
   const freshGoals = goalsMet.filter((goal) => !alreadyMet.has(goal.id));
   const goalXp = freshGoals.reduce((sum, goal) => sum + goal.xp, 0);
 
+  // Sin respuestas evaluables no hay precisión que medir: se conserva la marca
+  // anterior en vez de dar por bueno un 100% que regalaría los logros de precisión.
+  const runAccuracy = run.answered ? run.perfect / run.answered : 0;
+
   next.xp += goalXp;
   next.chapters[chapter.id] = {
     nodeIndex: chapter.nodes.length,
     completed: true,
     goalsMet: [...new Set([...(existing?.goalsMet ?? []), ...goalsMet.map((g) => g.id)])],
-    bestAccuracy: Math.max(existing?.bestAccuracy ?? 0, run.answered ? run.perfect / run.answered : 1),
+    bestAccuracy: Math.max(existing?.bestAccuracy ?? 0, runAccuracy),
     runs: (existing?.runs ?? 0) + 1,
+    // La partida se cierra aquí: la próxima vuelta al capítulo empieza de cero.
+    run: undefined,
   };
 
   if (!existing?.completed) next.stats.chaptersCompleted += 1;
