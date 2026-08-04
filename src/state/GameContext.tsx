@@ -34,7 +34,7 @@ interface GameContextValue {
   chooseLevel: (level: CEFRLevel) => void;
   forceUnlock: (level: CEFRLevel) => void;
   commitAnswer: (run: RunStats, record: AnswerRecord) => RunStats;
-  checkpoint: (chapterId: string, nodeIndex: number) => void;
+  checkpoint: (chapterId: string, nodeIndex: number, run: RunStats) => void;
   finishChapter: (chapter: Chapter, run: RunStats) => ChapterOutcome;
   resetAll: () => void;
 }
@@ -108,7 +108,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   );
 
   const checkpoint = useCallback(
-    (chapterId: string, nodeIndex: number) => apply(saveCheckpoint(latest.current, chapterId, nodeIndex)),
+    (chapterId: string, nodeIndex: number, run: RunStats) =>
+      apply(saveCheckpoint(latest.current, chapterId, nodeIndex, run)),
     [apply],
   );
 
