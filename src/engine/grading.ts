@@ -33,6 +33,10 @@ export function gradeWriting(node: WritingNode, raw: string): GradeResult {
     return { grade: 'wrong', ratio: 0, notes: ['Escribe algo antes de enviar.'] };
   }
 
+  if (node.slots?.length) {
+    return gradeAgainstSlots(node.slots, input, node.answers?.[0]);
+  }
+
   if (node.answers?.length) {
     return gradeAgainstAnswers(node.answers, input, node.rubric);
   }
@@ -89,6 +93,100 @@ function gradeAgainstAnswers(answers: string[], input: string, rubric?: Rubric):
     notes: ['No es eso todavía. Lee la pista y prueba otra vez.'],
     model: closest,
   };
+}
+
+const ORDINALS = ['primer', 'segundo', 'tercer', 'cuarto', 'quinto'];
+
+function slotLabel(index: number): string {
+  return ORDINALS[index] ? `${ORDINALS[index]} hueco` : `hueco ${index + 1}`;
+}
+
+function capitalize(value: string): string {
+  return value[0].toUpperCase() + value.slice(1);
+}
+
+function tokenSize(value: string): number {
+  return value.split(' ').filter(Boolean).length;
+}
+
+/**
+ * Corrige hueco a hueco.
+ *
+ * Como todo se escribe en un único campo, hay que repartir lo tecleado entre los
+ * huecos: para cada uno se busca la variante que encaje y se consumen sus
+ * palabras; si no encaja ninguna, se consumen tantas como ocupa la respuesta
+ * esperada. El reparto es exacto porque las variantes de un mismo hueco miden lo
+ * mismo (`there were` / `there was`), cosa que verifica `npm run verify`.
+ *
+ * No se perdonan erratas: en un hueco lo que se examina es la forma exacta, y
+ * «a» por «an» o «broken» por «broke» son justo el error que se evalúa. Cuando
+ * la palabra se parece mucho a la esperada se dice que revise la ortografía,
+ * pero el hueco sigue sin darse por bueno.
+ */
+function gradeAgainstSlots(slots: string[][], input: string, fallback?: string): GradeResult {
+  const tokens = normalize(input).split(' ').filter(Boolean);
+  const checklist: Array<{ label: string; met: boolean }> = [];
+  const notes: string[] = [];
+  let cursor = 0;
+  let met = 0;
+
+  slots.forEach((variants, index) => {
+    const label = slotLabel(index);
+    const accepted = variants.map(normalize);
+    // Las variantes largas se prueban primero: si una corta fuese principio de
+    // otra larga, aceptarla dejaría descolocados los huecos siguientes.
+    const byLength = [...accepted].sort((a, b) => tokenSize(b) - tokenSize(a));
+
+    const hit = byLength.find(
+      (variant) => tokens.slice(cursor, cursor + tokenSize(variant)).join(' ') === variant,
+    );
+
+    if (hit) {
+      cursor += tokenSize(hit);
+      met++;
+      checklist.push({ label: `${capitalize(label)}: «${hit}»`, met: true });
+      notes.push(`El ${label} está bien: «${hit}».`);
+      return;
+    }
+
+    const written = tokens.slice(cursor, cursor + tokenSize(accepted[0])).join(' ');
+    cursor += tokenSize(accepted[0]);
+
+    if (!written) {
+      checklist.push({ label: `${capitalize(label)}: sin respuesta`, met: false });
+      notes.push(`Falta el ${label}.`);
+      return;
+    }
+
+    checklist.push({ label: `${capitalize(label)}: «${written}»`, met: false });
+
+    const closest = accepted.reduce((best, variant) =>
+      levenshtein(written, variant) < levenshtein(written, best) ? variant : best,
+    );
+    const isTypo = closest.length >= 5 && levenshtein(written, closest) <= typoTolerance(closest);
+
+    notes.push(
+      isTypo
+        ? `El ${label} está casi: «${written}» se parece, pero no está bien escrito.`
+        : `El ${label} no: «${written}» no encaja ahí.`,
+    );
+  });
+
+  const leftover = tokens.slice(cursor).join(' ');
+  if (leftover) {
+    notes.push(`Sobra «${leftover}»: sólo hay ${slots.length} huecos que rellenar.`);
+  }
+
+  if (met === slots.length && !leftover) {
+    return { grade: 'perfect', ratio: 1, notes: ['¡Exacto!'], model: fallback, checklist };
+  }
+
+  if (met === 0) {
+    return { grade: 'wrong', ratio: 0, notes, model: fallback, checklist };
+  }
+
+  // Acertar la mitad no es acertar, pero tampoco es empezar de cero.
+  return { grade: 'close', ratio: (met / slots.length) * 0.8, notes, model: fallback, checklist };
 }
 
 function gradeAgainstRubric(rubric: Rubric, input: string): GradeResult {
