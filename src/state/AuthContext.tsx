@@ -17,9 +17,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    ensureDemoUser();
-    setUser(authService.current());
-    setReady(true);
+    let active = true;
+
+    // `ready` espera a la siembra: si no, el botón de demo podría pulsarse antes
+    // de que exista la cuenta.
+    void ensureDemoUser().finally(() => {
+      if (!active) return;
+      setUser(authService.current());
+      setReady(true);
+    });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {

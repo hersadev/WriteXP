@@ -32,18 +32,88 @@ function writeUsers(users: StoredUser[]): void {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
+const PBKDF2_ITERATIONS = 210_000;
+const SALT_BYTES = 16;
+const KEY_BITS = 256;
+
 /**
- * Hash de juguete, suficiente para no dejar la contraseña en claro en el
- * localStorage de un prototipo. NO es seguridad real: cuando se conecte un
- * backend, esta función desaparece junto con toda la clase.
+ * El hash anterior (FNV-1a truncado a 32 bits, sin sal) tenía colisiones
+ * encontrables en segundos: bastaba dar con *cualquier* cadena del mismo hash
+ * para entrar. Se conserva sólo para reconocer las cuentas creadas antes del
+ * cambio y re-hashearlas en su primer inicio de sesión (ver `signIn`).
  */
-function toyHash(value: string): string {
+function legacyToyHash(value: string): string {
   let h = 2166136261;
   for (let i = 0; i < value.length; i++) {
     h ^= value.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
   return (h >>> 0).toString(36);
+}
+
+function subtle(): SubtleCrypto {
+  const available = globalThis.crypto?.subtle;
+  if (!available) {
+    throw new AuthError(
+      'Este navegador necesita un contexto seguro (https o localhost) para guardar la contraseña.',
+    );
+  }
+  return available;
+}
+
+function toBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
+function fromBase64(value: string): Uint8Array<ArrayBuffer> {
+  return Uint8Array.from(atob(value), (char) => char.charCodeAt(0));
+}
+
+async function deriveKey(
+  password: string,
+  salt: Uint8Array<ArrayBuffer>,
+  iterations: number,
+): Promise<string> {
+  const material = await subtle().importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits'],
+  );
+  const bits = await subtle().deriveBits(
+    { name: 'PBKDF2', hash: 'SHA-256', salt, iterations },
+    material,
+    KEY_BITS,
+  );
+  return toBase64(new Uint8Array(bits));
+}
+
+/**
+ * PBKDF2-SHA256 con sal aleatoria por usuario.
+ * Formato almacenado: `pbkdf2$<iteraciones>$<sal base64>$<clave base64>`.
+ */
+async function hashPassword(password: string): Promise<string> {
+  const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
+  const key = await deriveKey(password, salt, PBKDF2_ITERATIONS);
+  return `pbkdf2$${PBKDF2_ITERATIONS}$${toBase64(salt)}$${key}`;
+}
+
+async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const [scheme, iterations, salt, key] = stored.split('$');
+  if (scheme !== 'pbkdf2' || !iterations || !salt || !key) return false;
+
+  const computed = await deriveKey(password, fromBase64(salt), Number(iterations));
+  return constantTimeEquals(computed, key);
+}
+
+function constantTimeEquals(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 function publicUser(user: StoredUser): User {
@@ -56,15 +126,31 @@ function delay<T>(value: T, ms = 350): Promise<T> {
 }
 
 /** Crea y persiste el usuario, SIN abrir sesión. Iniciar sesión es cosa de quien llame. */
-function createUserRecord({ name, email, password }: { name: string; email: string; password: string }): StoredUser {
+async function createUserRecord({
+  name,
+  email,
+  password,
+}: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<StoredUser> {
   const cleanEmail = email.trim().toLowerCase();
-  const users = readUsers();
 
-  if (users.some((u) => u.email === cleanEmail)) {
+  if (readUsers().some((u) => u.email === cleanEmail)) {
     throw new AuthError('Ya existe una cuenta con ese correo. Inicia sesión.');
   }
   if (password.length < 6) {
     throw new AuthError('La contraseña necesita al menos 6 caracteres.');
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  // Se relee: derivar la clave tarda cientos de ms y otra alta puede haber
+  // escrito mientras tanto.
+  const users = readUsers();
+  if (users.some((u) => u.email === cleanEmail)) {
+    throw new AuthError('Ya existe una cuenta con ese correo. Inicia sesión.');
   }
 
   const user: StoredUser = {
@@ -72,11 +158,20 @@ function createUserRecord({ name, email, password }: { name: string; email: stri
     name: name.trim() || cleanEmail.split('@')[0],
     email: cleanEmail,
     createdAt: new Date().toISOString(),
-    passwordHash: toyHash(password),
+    passwordHash,
   };
 
   writeUsers([...users, user]);
   return user;
+}
+
+/**
+ * Sustituye el hash de juguete por PBKDF2 tras un inicio de sesión válido.
+ * Así las cuentas antiguas no se quedan fuera ni conservan el hash débil.
+ */
+async function upgradeLegacyHash(userId: string, password: string): Promise<void> {
+  const passwordHash = await hashPassword(password);
+  writeUsers(readUsers().map((u) => (u.id === userId ? { ...u, passwordHash } : u)));
 }
 
 /** Implementación local: usuarios y sesión en localStorage. */
@@ -89,7 +184,7 @@ export class LocalAuthService implements AuthService {
   }
 
   async signUp(input: { name: string; email: string; password: string }): Promise<User> {
-    const user = createUserRecord(input);
+    const user = await createUserRecord(input);
     localStorage.setItem(SESSION_KEY, user.id);
     return delay(publicUser(user));
   }
@@ -97,9 +192,20 @@ export class LocalAuthService implements AuthService {
   async signIn({ email, password }: { email: string; password: string }): Promise<User> {
     const cleanEmail = email.trim().toLowerCase();
     const user = readUsers().find((u) => u.email === cleanEmail);
-
-    if (!user || user.passwordHash !== toyHash(password)) {
+    if (!user) {
       throw new AuthError('Correo o contraseña incorrectos.');
+    }
+
+    const isLegacy = !user.passwordHash.startsWith('pbkdf2$');
+    const ok = isLegacy
+      ? user.passwordHash === legacyToyHash(password)
+      : await verifyPassword(password, user.passwordHash);
+
+    if (!ok) {
+      throw new AuthError('Correo o contraseña incorrectos.');
+    }
+    if (isLegacy) {
+      await upgradeLegacyHash(user.id, password);
     }
 
     localStorage.setItem(SESSION_KEY, user.id);
@@ -117,11 +223,12 @@ export const authService: AuthService = new LocalAuthService();
 export const DEMO_CREDENTIALS = { email: 'demo@writexp.app', password: 'demo1234', name: 'Viajero' };
 
 /**
- * Siembra la cuenta de prueba si no existe. Es síncrona y no toca la sesión a
- * propósito: sembrar no es entrar, y hacerlo con `signUp` dejaba al visitante
- * dentro de la app sin haber pulsado nada.
+ * Siembra la cuenta de prueba si no existe. No toca la sesión a propósito:
+ * sembrar no es entrar, y hacerlo con `signUp` dejaba al visitante dentro de la
+ * app sin haber pulsado nada. Es asíncrona porque derivar el hash lo es; hay que
+ * esperarla antes de ofrecer el botón de demo.
  */
-export function ensureDemoUser(): void {
+export async function ensureDemoUser(): Promise<void> {
   const exists = readUsers().some((u) => u.email === DEMO_CREDENTIALS.email);
-  if (!exists) createUserRecord(DEMO_CREDENTIALS);
+  if (!exists) await createUserRecord(DEMO_CREDENTIALS);
 }

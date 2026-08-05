@@ -123,6 +123,20 @@ function gradeAgainstRubric(rubric: Rubric, input: string): GradeResult {
     notes.push(`Evita «${banned.join('», «')}»: busca una alternativa más precisa.`);
   }
 
+  // Un texto de relleno puede cumplir el recuento y las keywords sin decir nada,
+  // así que se descarta antes de puntuar.
+  const nonsense = nonsenseNotes(input);
+  if (nonsense.length) {
+    checklist.push({ label: 'Un texto con sentido, no relleno', met: false });
+    return {
+      grade: 'wrong',
+      ratio: 0,
+      // Dos motivos bastan: con cuatro el aviso se vuelve una pared de texto.
+      notes: [...nonsense.slice(0, 2), 'Contar palabras no basta: la frase tiene que decir algo.'],
+      checklist,
+    };
+  }
+
   notes.push(...styleNotes(input, rubric));
 
   const total = checklist.length || 1;
@@ -143,6 +157,79 @@ function gradeAgainstRubric(rubric: Rubric, input: string): GradeResult {
   }
 
   return { grade: 'wrong', ratio: 0, notes, checklist };
+}
+
+/**
+ * Palabras de función: se repiten en cualquier texto correcto, así que no
+ * cuentan como vocabulario acaparado.
+ */
+const FUNCTION_WORDS = new Set([
+  'the', 'a', 'an', 'and', 'or', 'but', 'of', 'to', 'in', 'on', 'at', 'for', 'with', 'from', 'by',
+  'as', 'that', 'this', 'these', 'those', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'it',
+  'its', 'i', 'you', 'he', 'she', 'we', 'they', 'my', 'your', 'his', 'her', 'our', 'their', 'not',
+  'no', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'can', 'could', 'should',
+  'may', 'might', 'must', 'if', 'than', 'then', 'so', 'because', 'there', 'what', 'when', 'who',
+]);
+
+/** Interjecciones sin vocal que sí son inglés. */
+const VOWELLESS_WORDS = new Set(['shh', 'hmm', 'mhm', 'psst', 'tsk', 'brr', 'grr', 'nth']);
+
+/**
+ * Detecta el texto que cumple la rúbrica «por fuera» pero no comunica nada:
+ * la misma palabra repetida, vocabulario mínimo o cadenas impronunciables.
+ * Sin esto, «Zzz word word word word word word word word word.» sacaba la nota
+ * máxima en b2-3-n4 sólo por tener entre 8 y 25 palabras.
+ */
+function nonsenseNotes(input: string): string[] {
+  const words = normalizeLoose(input).split(' ').filter(Boolean);
+  if (words.length < 3) return [];
+
+  const notes: string[] = [];
+
+  // 1. La misma palabra tres veces seguidas.
+  let run = 1;
+  for (let i = 1; i < words.length; i++) {
+    run = words[i] === words[i - 1] ? run + 1 : 1;
+    if (run >= 3) {
+      notes.push(`Repites «${words[i]}» varias veces seguidas: eso no es una frase.`);
+      break;
+    }
+  }
+
+  // 2. Vocabulario pobre. Sólo en textos cortos: en un ensayo largo la
+  //    repetición de palabras comunes es normal y la mide la regla 3.
+  const distinct = new Set(words);
+  if (words.length >= 6 && words.length <= 40 && distinct.size / words.length < 0.5) {
+    const cuantas = distinct.size === 1 ? 'una sola palabra distinta' : `sólo ${distinct.size} palabras distintas`;
+    notes.push(`Usas ${cuantas} en un texto de ${words.length}. Escribe una frase de verdad.`);
+  }
+
+  // 3. Una única palabra con contenido acapara el texto.
+  const counts = new Map<string, number>();
+  for (const word of words) {
+    if (FUNCTION_WORDS.has(word)) continue;
+    counts.set(word, (counts.get(word) ?? 0) + 1);
+  }
+  for (const [word, count] of counts) {
+    if (count >= 4 && count / words.length >= 0.2) {
+      notes.push(`«${word}» aparece ${count} veces: varía el vocabulario.`);
+      break;
+    }
+  }
+
+  // 4. Cadenas impronunciables: sin vocal o con la misma letra tres veces.
+  const gibberish = words.filter(isGibberish);
+  if (gibberish.length >= 2 || gibberish.length / words.length >= 0.1) {
+    notes.push(`Esto no son palabras: «${[...new Set(gibberish)].join('», «')}».`);
+  }
+
+  return notes;
+}
+
+function isGibberish(word: string): boolean {
+  if (word.length < 3 || !/^[a-z]+$/.test(word)) return false;
+  if (VOWELLESS_WORDS.has(word)) return false;
+  return !/[aeiouy]/.test(word) || /(.)\1{2,}/.test(word);
 }
 
 /** Reglas de forma que aplican a cualquier respuesta escrita. */
