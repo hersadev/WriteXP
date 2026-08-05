@@ -11,6 +11,7 @@ import { CHAPTERS, chapterMaxXp } from '../src/data/story';
 import { LEVELS } from '../src/data/levels';
 import { ACHIEVEMENTS } from '../src/data/achievements';
 import { gradeWriting } from '../src/engine/grading';
+import { normalize } from '../src/engine/text';
 import type { WritingNode } from '../src/types';
 
 const problems: string[] = [];
@@ -21,6 +22,54 @@ const words = (text: string): number => (text.trim() ? text.trim().split(/\s+/).
 /** La respuesta más corta que se acepta: es la que escribe el jugador con prisa. */
 const shortestAnswerWords = (node: WritingNode): number | undefined =>
   node.answers?.length ? Math.min(...node.answers.map(words)) : undefined;
+
+/**
+ * Los huecos de un `gapFill` se corrigen repartiendo lo que escribe el jugador,
+ * y ese reparto sólo es exacto si se cumplen dos cosas: que las variantes de un
+ * mismo hueco ocupen las mismas palabras, y que combinar los huecos dé
+ * exactamente las respuestas de `answers` (que es lo que se enseña al rendirse).
+ */
+function checkSlots(node: WritingNode, out: string[]): void {
+  const slots = node.slots!;
+
+  if (slots.length < 2) {
+    out.push(`${node.id}: 'slots' con un solo hueco, usa 'answers'`);
+    return;
+  }
+
+  slots.forEach((variants, index) => {
+    if (!variants.length) {
+      out.push(`${node.id}: el hueco ${index + 1} no acepta ninguna respuesta`);
+      return;
+    }
+    const sizes = new Set(variants.map(words));
+    if (sizes.size > 1) {
+      out.push(
+        `${node.id}: las variantes del hueco ${index + 1} miden distinto (${variants.join(' / ')}), ` +
+          'y entonces no se puede saber dónde acaba cada hueco',
+      );
+    }
+  });
+
+  const gaps = (node.prompt.match(/_+(\s+_+)*/g) ?? []).length;
+  if (gaps && gaps !== slots.length) {
+    out.push(`${node.id}: el enunciado tiene ${gaps} huecos y 'slots' declara ${slots.length}`);
+  }
+
+  const combos = slots.reduce<string[]>(
+    (acc, variants) => acc.flatMap((prefix) => variants.map((v) => `${prefix} ${v}`.trim())),
+    [''],
+  );
+  const declared = new Set((node.answers ?? []).map(normalize));
+  const derived = new Set(combos.map(normalize));
+
+  for (const combo of derived) {
+    if (!declared.has(combo)) out.push(`${node.id}: los huecos aceptan «${combo}», que no está en 'answers'`);
+  }
+  for (const answer of declared) {
+    if (!derived.has(answer)) out.push(`${node.id}: 'answers' acepta «${answer}», que los huecos rechazan`);
+  }
+}
 
 const chapterIds = new Set<string>();
 const nodeIds = new Set<string>();
@@ -114,6 +163,8 @@ for (const chapter of CHAPTERS) {
     if (!writing.answers?.length && !writing.model) {
       problems.push(`${writing.id}: ejercicio con rúbrica sin 'model' (la pista no es una respuesta)`);
     }
+
+    if (writing.slots?.length) checkSlots(writing, problems);
 
     // La prueba de fuego: la solución modelo tiene que aprobar.
     const model = writing.model ?? writing.answers?.[0];

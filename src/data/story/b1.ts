@@ -300,6 +300,7 @@ export const B1_CHAPTERS: Chapter[] = [
         promptEs:
           'Segundo condicional. Escribe las dos palabras separadas por un espacio.',
         answers: ['were would', 'was would'],
+        slots: [['were', 'was'], ['would']],
         hint: 'La forma culta del segundo condicional usa "were" para todas las personas.',
         placeholder: 'were would',
       },

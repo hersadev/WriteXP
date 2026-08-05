@@ -43,6 +43,7 @@ export const A2_CHAPTERS: Chapter[] = [
         promptEs:
           'Pon los dos verbos en pasado simple. Escríbelos separados por un espacio.',
         answers: ['broke took'],
+        slots: [['broke'], ['took']],
         hint: 'Los dos son irregulares: break → br___, take → t___.',
         placeholder: 'broke took',
       },
@@ -54,6 +55,7 @@ export const A2_CHAPTERS: Chapter[] = [
         promptEs:
           'Completa con «there was» o «there were» (en ese orden, separados por coma).',
         answers: ['there were, there was', 'there were there was'],
+        slots: [['there were'], ['there was']],
         hint: 'Plural primero (three candles), singular después (no light).',
         placeholder: 'there were, there was',
       },
@@ -312,6 +314,7 @@ export const A2_CHAPTERS: Chapter[] = [
         promptEs:
           'Completa: primero una dirección (left/right) y luego una preposición que signifique «al otro lado de». Separadas por un espacio.',
         answers: ['left across', 'right across'],
+        slots: [['left', 'right'], ['across']],
         hint: 'La segunda palabra aparece en el glosario del texto anterior.',
         placeholder: 'left across',
       },

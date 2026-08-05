@@ -84,6 +84,7 @@ export const A1_CHAPTERS: Chapter[] = [
         promptEs:
           'Completa con el verbo to be. Escribe las dos palabras separadas por un espacio (ej: "are am").',
         answers: ['is am'],
+        slots: [['is'], ['am']],
         hint: 'Tercera persona del singular, y luego la forma de "I".',
         placeholder: 'is am',
       },
@@ -176,6 +177,7 @@ export const A1_CHAPTERS: Chapter[] = [
         promptEs:
           'Completa con «a» o «an». Escribe las dos palabras separadas por un espacio.',
         answers: ['an a'],
+        slots: [['an'], ['a']],
         hint: '«an» va delante de sonido vocálico.',
         placeholder: 'an a',
       },

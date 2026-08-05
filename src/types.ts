@@ -84,6 +84,17 @@ export interface WritingNode extends BaseNode {
   glossary?: GlossEntry[];
   /** Respuestas aceptadas. Si existe, manda sobre la rúbrica. */
   answers?: string[];
+  /**
+   * Sólo en ejercicios con más de un hueco: variantes aceptadas en CADA hueco,
+   * en orden. Permite corregirlos uno a uno y decir cuál está bien y cuál no,
+   * en vez de suspender la frase entera.
+   *
+   * Ej: 'Someone ___ the window and ___ the key.' → [['broke'], ['took']]
+   *
+   * Manda sobre `answers`, que se conserva como la solución que se enseña al
+   * rendirse. `npm run verify` comprueba que ambos digan lo mismo.
+   */
+  slots?: string[][];
   rubric?: Rubric;
   placeholder?: string;
   /** Pista que se ofrece tras el primer fallo: puede ser un esqueleto. */
