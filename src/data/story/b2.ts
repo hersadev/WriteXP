@@ -90,7 +90,6 @@ export const B2_CHAPTERS: Chapter[] = [
             'Elimina el registro coloquial',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         hint:
           "The Guild's handling of the incident has been widely criticised and several procedures appear to require revision.",
@@ -124,7 +123,6 @@ export const B2_CHAPTERS: Chapter[] = [
             'Sin contracciones ni coloquialismos',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         hint: 'This report examines… / It was established that… / Furthermore,… / It is recommended that…',
         model:
@@ -207,7 +205,6 @@ export const B2_CHAPTERS: Chapter[] = [
             'Sin descalificaciones personales',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         hint:
           'Although the Chancellor is right that the archive lacks security, this does not justify closing it to the public.',
@@ -256,7 +253,6 @@ export const B2_CHAPTERS: Chapter[] = [
             'Cierra proponiendo una solución',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         hint: 'The Chancellor argues that… / Admittedly,… / However,… / The evidence suggests… / I would therefore propose…',
         model:
@@ -333,7 +329,6 @@ export const B2_CHAPTERS: Chapter[] = [
             'Sin muletillas de conclusión («In conclusion», «To sum up»)',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         hint: 'A city that locks away its own memory has already begun to forget itself.',
         model: 'A city that locks away its own memory has already begun to forget itself.',
@@ -367,7 +362,6 @@ export const B2_CHAPTERS: Chapter[] = [
             'Registro formal: sin contracciones',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         hint: 'The question before the city is… / For instance,… / Admittedly,… / However,… / Ultimately,…',
         model:

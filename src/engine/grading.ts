@@ -213,6 +213,10 @@ function gradeAgainstRubric(rubric: Rubric, input: string): GradeResult {
     if (!met) notes.push(`Falta este recurso: ${label.toLowerCase()}.`);
   });
 
+  if (rubric.requireQuestionMark) {
+    checklist.push({ label: 'Termina con «?»', met: endsAsQuestion(input) });
+  }
+
   // Las prohibidas se buscan sin expandir contracciones (ver `normalizeLoose`).
   const looseInput = normalizeLoose(input);
   const banned = rubric.forbiddenWords?.filter((word) => containsPhraseLoose(looseInput, word)) ?? [];
@@ -330,6 +334,11 @@ function isGibberish(word: string): boolean {
   return !/[aeiouy]/.test(word) || /(.)\1{2,}/.test(word);
 }
 
+/** Cierra con «?», admitiendo comillas de cierre alrededor de la pregunta. */
+function endsAsQuestion(input: string): boolean {
+  return /\?["'”»]?$/.test(input.trim());
+}
+
 /** Reglas de forma que aplican a cualquier respuesta escrita. */
 function styleNotes(input: string, rubric?: Rubric): string[] {
   const notes: string[] = [];
@@ -339,8 +348,8 @@ function styleNotes(input: string, rubric?: Rubric): string[] {
     notes.push('En inglés la frase empieza con mayúscula.');
   }
 
-  if (rubric?.requireFinalPunctuation && !/[.!?]$/.test(trimmed)) {
-    notes.push('Cierra la frase con un punto o un signo de interrogación.');
+  if (rubric?.requireQuestionMark && !endsAsQuestion(input)) {
+    notes.push('Es una pregunta: ciérrala con «?».');
   }
 
   if (/\bi\b/.test(trimmed) && !/\bI\b/.test(trimmed)) {
