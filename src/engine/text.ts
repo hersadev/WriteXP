@@ -1,48 +1,93 @@
 import type { GlossEntry } from '@/types';
 
-/** Contracciones y variantes que tratamos como equivalentes al corregir. */
+/** Contracciones con una única lectura posible. */
 const EQUIVALENTS: Array<[RegExp, string]> = [
   [/\bi'm\b/g, 'i am'],
-  [/\byou're\b/g, 'you are'],
-  [/\bhe's\b/g, 'he is'],
-  [/\bshe's\b/g, 'she is'],
-  [/\bit's\b/g, 'it is'],
-  [/\bwe're\b/g, 'we are'],
-  [/\bthey're\b/g, 'they are'],
+  [/\b(you|we|they)'re\b/g, '$1 are'],
+  [/\b(i|you|we|they)'ve\b/g, '$1 have'],
+  [/\b(i|you|he|she|it|we|they|there|that|who)'ll\b/g, '$1 will'],
+  [/\blet's\b/g, 'let us'],
   [/\bdon't\b/g, 'do not'],
   [/\bdoesn't\b/g, 'does not'],
   [/\bdidn't\b/g, 'did not'],
   [/\bcan't\b/g, 'cannot'],
   [/\bwon't\b/g, 'will not'],
+  [/\bshan't\b/g, 'shall not'],
   [/\bisn't\b/g, 'is not'],
   [/\baren't\b/g, 'are not'],
   [/\bwasn't\b/g, 'was not'],
   [/\bweren't\b/g, 'were not'],
-  [/\bi've\b/g, 'i have'],
-  [/\bi'd\b/g, 'i would'],
-  [/\bi'll\b/g, 'i will'],
+  [/\bhaven't\b/g, 'have not'],
+  [/\bhasn't\b/g, 'has not'],
+  [/\bhadn't\b/g, 'had not'],
+  [/\bwouldn't\b/g, 'would not'],
+  [/\bshouldn't\b/g, 'should not'],
+  [/\bcouldn't\b/g, 'could not'],
+  [/\bmustn't\b/g, 'must not'],
+  [/\bmightn't\b/g, 'might not'],
+  [/\bneedn't\b/g, 'need not'],
 ];
 
 /**
- * Normaliza para comparar: minúsculas, sin acentos, sin puntuación,
- * espacios colapsados y contracciones expandidas.
+ * Contracciones con dos lecturas: «he's» es «he is» o «he has», y «he'd» es
+ * «he would» o «he had». Quedarse con una sola marcaría como errata la mitad
+ * de las respuestas correctas, así que se generan ambas y se compara contra
+ * todas.
+ *
+ * La lista de sujetos es cerrada a propósito: con un `(\w+)'s` genérico el
+ * posesivo («the Guild's handling») se expandiría a «the guild is handling».
  */
-export function normalize(input: string): string {
-  let out = input
+const AMBIGUOUS: Array<[RegExp, string[]]> = [
+  [/\b(he|she|it|that|this|there|here|who|what|where|when|why|how)'s\b/g, ['$1 is', '$1 has']],
+  [/\b(i|you|he|she|it|we|they|that|there|who)'d\b/g, ['$1 would', '$1 had']],
+];
+
+function stripAccents(input: string): string {
+  return input
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[’‘`´]/g, "'")
     .trim();
+}
 
-  for (const [pattern, replacement] of EQUIVALENTS) {
-    out = out.replace(pattern, replacement);
-  }
-
-  return out
+function stripPunctuation(input: string): string {
+  return input
     .replace(/[.,!?;:"“”()\[\]]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * Todas las lecturas normalizadas de un texto: una por cada combinación de
+ * contracciones ambiguas, cuatro como mucho. La primera es la lectura por
+ * defecto, la que devuelve `normalize`.
+ */
+export function normalizeVariants(input: string): string[] {
+  let base = stripAccents(input);
+
+  for (const [pattern, replacement] of EQUIVALENTS) {
+    base = base.replace(pattern, replacement);
+  }
+
+  let variants = [base];
+  for (const [pattern, readings] of AMBIGUOUS) {
+    // Si el patrón no aparece, las dos lecturas salen idénticas y el Set las
+    // vuelve a juntar: no hace falta comprobarlo antes.
+    variants = [...new Set(variants.flatMap((v) => readings.map((r) => v.replace(pattern, r))))];
+  }
+
+  return [...new Set(variants.map(stripPunctuation))];
+}
+
+/**
+ * Normaliza para comparar: minúsculas, sin acentos, sin puntuación,
+ * espacios colapsados y contracciones expandidas. Ante una contracción
+ * ambigua se queda con la primera lectura; para tenerlas todas en cuenta al
+ * corregir está `normalizeVariants`.
+ */
+export function normalize(input: string): string {
+  return normalizeVariants(input)[0];
 }
 
 /**
@@ -66,12 +111,17 @@ export function wordCount(input: string): number {
   return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
-/** Distancia de edición, para distinguir un typo de un error real. */
-export function levenshtein(a: string, b: string): number {
+/**
+ * Distancia de edición, para distinguir un typo de un error real.
+ * Cuenta también la transposición como una sola edición (Damerau): «sevne»
+ * por «seven» son dos teclas bailadas, no dos fallos.
+ */
+export function editDistance(a: string, b: string): number {
   if (a === b) return 0;
   if (!a.length) return b.length;
   if (!b.length) return a.length;
 
+  let prevPrev = new Array<number>(b.length + 1);
   let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
   let curr = new Array<number>(b.length + 1);
 
@@ -79,23 +129,42 @@ export function levenshtein(a: string, b: string): number {
     curr[0] = i;
     for (let j = 1; j <= b.length; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+      let best = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        best = Math.min(best, prevPrev[j - 2] + 1);
+      }
+      curr[j] = best;
     }
-    [prev, curr] = [curr, prev];
+    [prevPrev, prev, curr] = [prev, curr, prevPrev];
   }
 
   return prev[b.length];
 }
 
-/** Tolerancia de typos proporcional a la longitud de la respuesta esperada. */
+/**
+ * Tolerancia de typos proporcional a la longitud de la respuesta esperada.
+ *
+ * En las respuestas cortas no hay margen: a «sky» le basta una letra para
+ * convertirse en «sly», «spy» o «shy», y a «do» para volverse «go» o «no».
+ * Son palabras distintas —justo lo que el ejercicio evalúa—, así que por
+ * debajo de cinco caracteres se exige la forma exacta.
+ */
 export function typoTolerance(expected: string): number {
-  if (expected.length <= 4) return 1;
-  if (expected.length <= 12) return 2;
-  return 3;
+  return Math.min(3, Math.floor(expected.length / 5));
 }
 
 export function containsPhrase(haystack: string, needle: string): boolean {
   return matches(haystack, normalize(needle));
+}
+
+/**
+ * Como `containsPhrase`, pero cruzando todas las lecturas de las dos partes:
+ * así «he's» encuentra tanto «he is» como «he has». Los `haystacks` deben
+ * venir de `normalizeVariants`.
+ */
+export function containsPhraseAny(haystacks: string[], needle: string): boolean {
+  const needles = normalizeVariants(needle);
+  return haystacks.some((haystack) => needles.some((n) => matches(haystack, n)));
 }
 
 /** Búsqueda sin expandir contracciones. El `haystack` debe venir de `normalizeLoose`. */
