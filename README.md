@@ -71,9 +71,10 @@ En **A1 y A2 el ejemplo y la segunda pista son obligatorios** (lo exige el verif
 empieza no sabe aún qué forma tiene una respuesta buena, y enseñársela no es regalarle la suya. De
 B1 en adelante son opcionales.
 
-El `placeholder` no es andamiaje: está dentro del recuadro de respuesta y se lee gratis, así que
-dice **de qué forma se responde** («dos palabras…», «conector…»), nunca con qué palabras. El
-verificador rechaza el que contenga una respuesta aceptada.
+Ni el `prompt` ni el `placeholder` son andamiaje, y el verificador rechaza los que contengan una
+respuesta aceptada. El enunciado en inglés ambienta el ejercicio sin nombrar lo que hay que
+escribir («holds up 7 loaves», no «seven loaves»); el placeholder, que se lee gratis dentro del
+recuadro, dice **de qué forma se responde** («dos palabras…», «conector…»), nunca con qué palabras.
 
 ## Objetivos y logros
 
@@ -119,7 +120,8 @@ Dos reglas que conviene mantener:
 - [scripts/verify-content.ts](scripts/verify-content.ts) — ids únicos, nodos corregibles, objetivos
   alcanzables y, sobre todo, que **la solución modelo de cada ejercicio aprueba su propia rúbrica**.
   Es lo que evita publicar una consigna imposible de cumplir. También vigila el andamiaje: que A1 y
-  A2 traigan ejemplo y segunda pista, y que **ni el ejemplo ni el placeholder regalen la respuesta**.
+  A2 traigan ejemplo y segunda pista, y que **ni el enunciado, ni el ejemplo, ni el placeholder
+  regalen la respuesta**.
 - [scripts/simulate-playthrough.ts](scripts/simulate-playthrough.ts) — juega los 12 capítulos
   respondiendo perfecto y comprueba XP, objetivos, curva de niveles y desbloqueos.
 

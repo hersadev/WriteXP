@@ -295,7 +295,7 @@ export const B2_CHAPTERS: Chapter[] = [
         id: 'b2-3-n2',
         kind: 'gapFill',
         xp: 18,
-        prompt: 'Not only ___ the archive irreplaceable, but it is also the only public record of the war.',
+        prompt: 'Not only ___ the archive irreplaceable, but it also contains the only public record of the war.',
         promptEs:
           'Inversión tras «Not only»: escribe el verbo que falta (una palabra).',
         answers: ['is'],
