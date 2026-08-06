@@ -11,11 +11,18 @@ import { CHAPTERS, chapterMaxXp } from '../src/data/story';
 import { LEVELS } from '../src/data/levels';
 import { ACHIEVEMENTS } from '../src/data/achievements';
 import { gradeWriting } from '../src/engine/grading';
-import { normalize } from '../src/engine/text';
-import type { WritingNode } from '../src/types';
+import { containsPhrase, normalize } from '../src/engine/text';
+import type { CEFRLevel, WritingNode } from '../src/types';
 
 const problems: string[] = [];
 const WRITING_KINDS = ['writeWord', 'gapFill', 'writeSentence', 'writeFree'];
+
+/**
+ * Niveles de entrada: quien juega aquí todavía no sabe qué forma tiene una
+ * respuesta buena, así que cada ejercicio trae un ejemplo resuelto visible desde
+ * el principio y una segunda pista antes de tener que rendirse.
+ */
+const BEGINNER_LEVELS: CEFRLevel[] = ['A1', 'A2'];
 
 const words = (text: string): number => (text.trim() ? text.trim().split(/\s+/).length : 0);
 
@@ -68,6 +75,28 @@ function checkSlots(node: WritingNode, out: string[]): void {
   }
   for (const answer of declared) {
     if (!derived.has(answer)) out.push(`${node.id}: 'answers' acepta «${answer}», que los huecos rechazan`);
+  }
+}
+
+/**
+ * El ejemplo enseña el patrón, no la solución: si se puede copiar y aprobar,
+ * el ejercicio deja de existir. Se comprueban las dos formas de regalarlo:
+ * incluir una respuesta cerrada, o cumplir por sí solo una rúbrica de varios
+ * requisitos. (Con un único requisito no se comprueba: en «escribe tu nombre»
+ * o «di dónde vives» no hay manera de enseñar el molde sin cumplirlo.)
+ */
+function checkExample(node: WritingNode, out: string[]): void {
+  const example = normalize(node.example!);
+
+  for (const answer of node.answers ?? []) {
+    if (containsPhrase(example, answer)) {
+      out.push(`${node.id}: el ejemplo contiene la respuesta «${answer}»`);
+    }
+  }
+
+  const requirements = node.rubric?.requiredKeywords?.length ?? 0;
+  if (!node.answers?.length && requirements >= 2 && gradeWriting(node, node.example!).grade === 'perfect') {
+    out.push(`${node.id}: copiando el ejemplo se aprueba la rúbrica; cámbiale el contenido`);
   }
 }
 
@@ -154,6 +183,15 @@ for (const chapter of CHAPTERS) {
     }
     if (!writing.hint) problems.push(`${writing.id}: sin pista (el jugador se quedaría bloqueado)`);
     if (!writing.promptEs) problems.push(`${writing.id}: sin consigna en español`);
+    if (writing.hint2 && !writing.hint) {
+      problems.push(`${writing.id}: tiene segunda pista pero no la primera`);
+    }
+
+    if (BEGINNER_LEVELS.includes(chapter.level)) {
+      if (!writing.example) problems.push(`${writing.id}: en ${chapter.level} todo ejercicio necesita un ejemplo resuelto`);
+      if (!writing.hint2) problems.push(`${writing.id}: en ${chapter.level} todo ejercicio necesita una segunda pista`);
+    }
+    if (writing.example) checkExample(writing, problems);
 
     /*
      * Sin `answers` la pista es un andamiaje (a menudo en español), así que hace

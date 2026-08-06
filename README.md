@@ -54,8 +54,22 @@ El motor de corrección ([src/engine/grading.ts](src/engine/grading.ts)) devuelv
 - **wrong** — se reintenta; tras el primer fallo aparece la pista y tras el segundo la opción de
   rendirse y ver la solución modelo (20% de la XP).
 
-La XP baja con cada intento (100% → 70% → 45%) y con las ayudas, así que se premia acertar a la
-primera sin dejar a nadie bloqueado.
+La XP baja con cada intento (100% → 70% → 45%), así que se premia acertar a la primera sin dejar a
+nadie bloqueado.
+
+### Andamiaje: ejemplo, pista, segunda pista, solución
+
+Cada ejercicio puede traer cuatro ayudas, de menos a más:
+
+1. `example` — un ejemplo del **mismo patrón con otro contenido**, visible desde el principio y sin
+   coste de XP. Nunca contiene la solución, y `npm run verify` lo comprueba.
+2. `hint` — pista de estructura, se ofrece tras el primer fallo.
+3. `hint2` — pista más explícita (a menudo un esqueleto con huecos), tras el segundo.
+4. `model` — la solución, sólo al rendirse: 20% de la XP y adiós al objetivo de «sin revelar».
+
+En **A1 y A2 el ejemplo y la segunda pista son obligatorios** (lo exige el verificador): quien
+empieza no sabe aún qué forma tiene una respuesta buena, y enseñársela no es regalarle la suya. De
+B1 en adelante son opcionales.
 
 ## Objetivos y logros
 
@@ -100,7 +114,8 @@ Dos reglas que conviene mantener:
 
 - [scripts/verify-content.ts](scripts/verify-content.ts) — ids únicos, nodos corregibles, objetivos
   alcanzables y, sobre todo, que **la solución modelo de cada ejercicio aprueba su propia rúbrica**.
-  Es lo que evita publicar una consigna imposible de cumplir.
+  Es lo que evita publicar una consigna imposible de cumplir. También vigila el andamiaje: que A1 y
+  A2 traigan ejemplo y segunda pista, y que **copiar el ejemplo no apruebe** el ejercicio.
 - [scripts/simulate-playthrough.ts](scripts/simulate-playthrough.ts) — juega los 12 capítulos
   respondiendo perfecto y comprueba XP, objetivos, curva de niveles y desbloqueos.
 
