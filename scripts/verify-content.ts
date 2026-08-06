@@ -101,6 +101,23 @@ function checkExample(node: WritingNode, out: string[]): void {
 }
 
 /**
+ * El enunciado en inglés ambienta el ejercicio, y es fácil que al ambientarlo se
+ * cuele la palabra que hay que escribir: «The baker holds up seven loaves. Write
+ * the number in letters.» El jugador la copia y no aprende nada. En los huecos el
+ * enunciado sí puede traer el infinitivo entre paréntesis —«(break / take)»—,
+ * porque eso es la consigna, no la respuesta conjugada.
+ */
+function checkPrompt(node: WritingNode, out: string[]): void {
+  const prompt = normalize(node.prompt);
+
+  for (const answer of node.answers ?? []) {
+    if (containsPhrase(prompt, answer)) {
+      out.push(`${node.id}: el enunciado contiene la respuesta «${answer}»`);
+    }
+  }
+}
+
+/**
  * El `placeholder` está dentro del propio recuadro de respuesta, en gris: es lo
  * primero que se lee y no cuesta nada mirarlo. Si trae la solución, el ejercicio
  * se contesta copiando. Vale para decir de qué forma se responde («dos palabras
@@ -214,6 +231,7 @@ for (const chapter of CHAPTERS) {
       if (!writing.example) problems.push(`${writing.id}: en ${chapter.level} todo ejercicio necesita un ejemplo resuelto`);
       if (!writing.hint2) problems.push(`${writing.id}: en ${chapter.level} todo ejercicio necesita una segunda pista`);
     }
+    checkPrompt(writing, problems);
     if (writing.example) checkExample(writing, problems);
     if (writing.placeholder) checkPlaceholder(writing, problems);
 
