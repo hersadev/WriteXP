@@ -72,7 +72,12 @@ export interface Rubric {
   /** Etiquetas legibles de cada requisito, en español, para el checklist. */
   checklist?: string[];
   requireCapitalStart?: boolean;
-  requireFinalPunctuation?: boolean;
+  /**
+   * Sólo en los ejercicios donde hay que preguntar: exige cerrar con «?».
+   * El punto final no se exige en ninguna parte —olvidarlo no es un error de
+   * inglés—, pero una pregunta sin interrogación sí está mal escrita.
+   */
+  requireQuestionMark?: boolean;
 }
 
 export interface WritingNode extends BaseNode {

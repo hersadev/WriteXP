@@ -79,7 +79,6 @@ export const A2_CHAPTERS: Chapter[] = [
           forbiddenWords: ['i go', 'i am walking'],
           checklist: ['Incluye «last night»', 'Usa un verbo en pasado («I went», «I was»…)'],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         example:
           'Así declaró el herrero: «Yesterday evening I closed the forge and I ate with my brother.» Fíjate en los verbos: closed, ate. Ninguno va en presente.',
@@ -113,9 +112,9 @@ export const A2_CHAPTERS: Chapter[] = [
         rubric: {
           minWords: 4,
           requiredKeywords: [['what', 'why', 'when', 'where', 'who', 'how']],
-          checklist: ['Empieza con una palabra wh-', 'Termina con signo de interrogación'],
+          checklist: ['Empieza con una palabra wh-'],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
+          requireQuestionMark: true,
         },
         example:
           'Las preguntas en pasado se montan igual: palabra wh- + did + sujeto + verbo en infinitivo. «When did the rain start?» «Where did you sleep?» Ojo: detrás de «did» el verbo va sin -ed.',
@@ -140,7 +139,6 @@ export const A2_CHAPTERS: Chapter[] = [
           ],
           checklist: ['Usa «first»', 'Usa «then» o «after that»', 'Cierra con «finally» o «in the end»'],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         example:
           'Un informe de otro caso, a medias, para que veas cómo encajan los conectores: «At first, the dogs barked in the yard. Later, somebody opened the gate and walked to the barn. The horses were gone before sunrise.» A ese informe le falta el remate: el tuyo sí tiene que cerrar con un conector de final.',
@@ -228,7 +226,6 @@ export const A2_CHAPTERS: Chapter[] = [
           ],
           checklist: ['Usa «was» para la descripción', 'Menciona el pelo («hair»)', 'Usa «wore», «had» o «was wearing» para la ropa'],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         example:
           'Así describió el posadero a otro cliente: «She was short and thin. She had a red scarf and old boots.» Ese es el molde: primero cómo era, luego lo que llevaba puesto.',
@@ -265,7 +262,6 @@ export const A2_CHAPTERS: Chapter[] = [
           requiredKeywords: [['than']],
           checklist: ['Usa una comparación con «than»'],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         example:
           'Comparaciones ya hechas: «The constable is older than the baker.» «This witness is more useful than the others.» «Witness 3 is less sure than witness 1.» Siempre: A + is + comparativo + than + B.',
@@ -294,7 +290,6 @@ export const A2_CHAPTERS: Chapter[] = [
             'Di dónde se la vio por última vez',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         example:
           'Un cartel viejo que sigue clavado en la puerta de la posada: «Wanted. A woman with grey eyes and a scar on her left hand. She travels with two horses and pays with foreign coins. Speak to the constable.» Le falta casi todo lo que a ti te piden: ni edad, ni ropa, ni dónde se la vio.',
@@ -377,9 +372,9 @@ export const A2_CHAPTERS: Chapter[] = [
         rubric: {
           minWords: 6,
           requiredKeywords: [['how do i get to', 'could you tell me', 'how can i get to']],
-          checklist: ['Usa una fórmula de pregunta educada', 'Termina con «?»'],
+          checklist: ['Usa una fórmula de pregunta educada'],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
+          requireQuestionMark: true,
         },
         example:
           'Otro viajero preguntó por la posada así: «Excuse me, how do I get to the inn?» Y también vale: «Could you tell me the way to the bridge?»',
@@ -422,7 +417,6 @@ export const A2_CHAPTERS: Chapter[] = [
             'Enlaza pasos con «until», «when» o «after»',
           ],
           requireCapitalStart: true,
-          requireFinalPunctuation: true,
         },
         example:
           'Unas indicaciones más cortas, para ver el molde: «Go past the forge and walk along the wall. The bakery is next to the well, opposite a red door.» Fíjate en los imperativos (go, walk) y en las preposiciones (along, next to, opposite). A las tuyas les falta además enlazar los pasos en el tiempo.',
