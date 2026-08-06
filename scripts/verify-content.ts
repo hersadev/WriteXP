@@ -100,6 +100,29 @@ function checkExample(node: WritingNode, out: string[]): void {
   }
 }
 
+/**
+ * El `placeholder` está dentro del propio recuadro de respuesta, en gris: es lo
+ * primero que se lee y no cuesta nada mirarlo. Si trae la solución, el ejercicio
+ * se contesta copiando. Vale para decir de qué forma se responde («dos palabras
+ * separadas por un espacio»), nunca con qué palabras.
+ */
+function checkPlaceholder(node: WritingNode, out: string[]): void {
+  const placeholder = normalize(node.placeholder!);
+
+  for (const answer of node.answers ?? []) {
+    if (containsPhrase(placeholder, answer)) {
+      out.push(`${node.id}: el placeholder contiene la respuesta «${answer}»`);
+    }
+  }
+
+  // Igual que con el ejemplo: con un solo requisito no hay forma de anunciar el
+  // molde sin cumplirlo, y el enunciado ya lo da.
+  const requirements = node.rubric?.requiredKeywords?.length ?? 0;
+  if (!node.answers?.length && requirements >= 2 && gradeWriting(node, node.placeholder!).grade === 'perfect') {
+    out.push(`${node.id}: copiando el placeholder se aprueba la rúbrica`);
+  }
+}
+
 const chapterIds = new Set<string>();
 const nodeIds = new Set<string>();
 const goalIds = new Set<string>();
@@ -192,6 +215,7 @@ for (const chapter of CHAPTERS) {
       if (!writing.hint2) problems.push(`${writing.id}: en ${chapter.level} todo ejercicio necesita una segunda pista`);
     }
     if (writing.example) checkExample(writing, problems);
+    if (writing.placeholder) checkPlaceholder(writing, problems);
 
     /*
      * Sin `answers` la pista es un andamiaje (a menudo en español), así que hace

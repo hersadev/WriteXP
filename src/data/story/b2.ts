@@ -54,7 +54,7 @@ export const B2_CHAPTERS: Chapter[] = [
           'Pasiva con modal: «debe ser revisada». Escribe las tres palabras (must…).',
         answers: ['must be reviewed', 'should be reviewed', 'must be examined'],
         hint: 'modal + be + participio.',
-        placeholder: 'must be reviewed',
+        placeholder: 'tres palabras…',
       },
       {
         id: 'b2-1-n4',
@@ -172,7 +172,7 @@ export const B2_CHAPTERS: Chapter[] = [
           'Estilo indirecto: transforma «will publish». Escribe las dos palabras.',
         answers: ['would publish'],
         hint: 'will → w_____ en estilo indirecto.',
-        placeholder: 'would publish',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'b2-2-n3',
@@ -311,7 +311,7 @@ export const B2_CHAPTERS: Chapter[] = [
           'Tercer condicional en pasiva. Escribe las tres palabras que faltan.',
         answers: ['could have been', 'would have been', 'might have been'],
         hint: 'modal + have + been + participio.',
-        placeholder: 'could have been',
+        placeholder: 'tres palabras…',
       },
       {
         id: 'b2-3-n4',

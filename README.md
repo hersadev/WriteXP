@@ -71,6 +71,10 @@ En **A1 y A2 el ejemplo y la segunda pista son obligatorios** (lo exige el verif
 empieza no sabe aún qué forma tiene una respuesta buena, y enseñársela no es regalarle la suya. De
 B1 en adelante son opcionales.
 
+El `placeholder` no es andamiaje: está dentro del recuadro de respuesta y se lee gratis, así que
+dice **de qué forma se responde** («dos palabras…», «conector…»), nunca con qué palabras. El
+verificador rechaza el que contenga una respuesta aceptada.
+
 ## Objetivos y logros
 
 - **Objetivos** (por capítulo): terminarlo, acertar N a la primera, no revelar soluciones, escribir
@@ -115,7 +119,7 @@ Dos reglas que conviene mantener:
 - [scripts/verify-content.ts](scripts/verify-content.ts) — ids únicos, nodos corregibles, objetivos
   alcanzables y, sobre todo, que **la solución modelo de cada ejercicio aprueba su propia rúbrica**.
   Es lo que evita publicar una consigna imposible de cumplir. También vigila el andamiaje: que A1 y
-  A2 traigan ejemplo y segunda pista, y que **copiar el ejemplo no apruebe** el ejercicio.
+  A2 traigan ejemplo y segunda pista, y que **ni el ejemplo ni el placeholder regalen la respuesta**.
 - [scripts/simulate-playthrough.ts](scripts/simulate-playthrough.ts) — juega los 12 capítulos
   respondiendo perfecto y comprueba XP, objetivos, curva de niveles y desbloqueos.
 

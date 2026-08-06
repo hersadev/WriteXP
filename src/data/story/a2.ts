@@ -48,7 +48,7 @@ export const A2_CHAPTERS: Chapter[] = [
           'Mismo ejercicio, resuelto: «She ___ the door and ___ my hand. (open / hold)» → «opened held». El regular añade -ed; el irregular cambia por dentro y hay que sabérselo.',
         hint: 'Los dos son irregulares: break → br___, take → t___.',
         hint2: 'Break se convierte en «broke». Take sigue el mismo camino que shake → shook.',
-        placeholder: 'broke took',
+        placeholder: 'dos verbos…',
       },
       {
         id: 'a2-1-n3',
@@ -63,7 +63,7 @@ export const A2_CHAPTERS: Chapter[] = [
           'Mismo ejercicio, resuelto: «___ a horse in the yard and ___ two men at the door.» → «there was, there were». Singular → was; plural → were.',
         hint: 'Plural primero (three candles), singular después (no light).',
         hint2: 'Aquí van al revés que en el ejemplo: primero el plural y después el singular.',
-        placeholder: 'there were, there was',
+        placeholder: 'dos expresiones, con coma…',
       },
       {
         id: 'a2-1-n4',
@@ -346,7 +346,7 @@ export const A2_CHAPTERS: Chapter[] = [
           'Mismo ejercicio, resuelto: «Turn ___ at the inn. The well is ___ the church.» → «left behind», o «right behind»: en el primer hueco vale cualquiera de las dos direcciones, en el segundo sólo la preposición correcta.',
         hint: 'La segunda palabra aparece en el glosario del texto anterior.',
         hint2: 'Primer hueco: left o right, la que quieras. Segundo: la que significa «al otro lado de», empieza por «a».',
-        placeholder: 'left across',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'a2-3-n3',
@@ -359,7 +359,7 @@ export const A2_CHAPTERS: Chapter[] = [
           'Mismo ejercicio, resuelto: «She ___ sleep here tonight.» → «is going to». Con «she» toca «is»; con «they», «are going to».',
         hint: 'Verbo to be + going to.',
         hint2: 'Con «I» el verbo to be sólo tiene una forma. Ésa, y detrás «going to».',
-        placeholder: 'am going to',
+        placeholder: 'tres palabras…',
       },
       {
         id: 'a2-3-n4',
