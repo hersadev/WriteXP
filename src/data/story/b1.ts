@@ -44,7 +44,7 @@ export const B1_CHAPTERS: Chapter[] = [
           'Presente perfecto de «live» con «I». Escribe las dos palabras (auxiliar + participio).',
         answers: ['have lived'],
         hint: 'have/has + participio.',
-        placeholder: 'have lived',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'b1-1-n3',
@@ -167,7 +167,7 @@ export const B1_CHAPTERS: Chapter[] = [
           'Pasiva en futuro: escribe las tres palabras que faltan («will…»).',
         answers: ['will be sealed'],
         hint: 'will + be + participio.',
-        placeholder: 'will be sealed',
+        placeholder: 'tres palabras…',
       },
       {
         id: 'b1-2-n3',
@@ -178,7 +178,7 @@ export const B1_CHAPTERS: Chapter[] = [
           'Fórmula formal para «en relación con / con respecto a». Tres palabras que empiezan por "with".',
         answers: ['with regard to', 'with respect to'],
         hint: 'with r_____ to',
-        placeholder: 'with regard to',
+        placeholder: 'tres palabras…',
       },
       {
         id: 'b1-2-n4',
@@ -286,7 +286,7 @@ export const B1_CHAPTERS: Chapter[] = [
           'Primer condicional: escribe las dos palabras que faltan.',
         answers: ['will close'],
         hint: 'If + presente, … will + infinitivo.',
-        placeholder: 'will close',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'b1-3-n3',
@@ -298,7 +298,7 @@ export const B1_CHAPTERS: Chapter[] = [
         answers: ['were would', 'was would'],
         slots: [['were', 'was'], ['would']],
         hint: 'La forma culta del segundo condicional usa "were" para todas las personas.',
-        placeholder: 'were would',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'b1-3-n4',

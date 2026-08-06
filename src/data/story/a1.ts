@@ -93,7 +93,7 @@ export const A1_CHAPTERS: Chapter[] = [
           'Mismo ejercicio, resuelto: «You ___ tall. We ___ friends.» → escribirías «are are», porque el verbo to be hace I am, you are, he/she/it is, we/they are.',
         hint: 'Tercera persona del singular, y luego la forma de "I".',
         hint2: 'El primero acompaña a «My name» (he/she/it) y el segundo a «I».',
-        placeholder: 'is am',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'a1-1-n6',
@@ -191,7 +191,7 @@ export const A1_CHAPTERS: Chapter[] = [
           'Mismo ejercicio, resuelto: «I have ___ dog and ___ umbrella.» → «a an», porque dog empieza por consonante y umbrella por vocal. Aquí el orden no tiene por qué ser el mismo.',
         hint: '«an» va delante de sonido vocálico.',
         hint2: 'Apple empieza por vocal y notebook por consonante. En ese orden.',
-        placeholder: 'an a',
+        placeholder: 'dos palabras…',
       },
       {
         id: 'a1-2-n3',

@@ -46,12 +46,28 @@ function Scene({ chapterId }: { chapterId: string }) {
   // Reanuda donde se quedó, salvo que el capítulo ya estuviera terminado.
   const [resume] = useState(() => resumePoint(chapter, progress));
   const [index, setIndex] = useState(resume.index);
+  // Nodo más lejano alcanzado en esta partida: todo lo anterior ya está contado
+  // en `run`, así que volver atrás es repasar, no volver a puntuar.
+  const [maxIndex, setMaxIndex] = useState(resume.index);
   const [run, setRun] = useState<RunStats>(resume.run);
   const [outcome, setOutcome] = useState<ChapterOutcome | null>(null);
+
+  const goTo = useCallback((target: number) => {
+    setIndex(target);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleComplete = useCallback(
     (record: AnswerRecord) => {
       if (!chapter) return;
+
+      // Repetición de un nodo ya resuelto: ni XP ni estadísticas ni checkpoint.
+      // Sólo se avanza, para no falsear la precisión ni el avance guardado.
+      if (index < maxIndex) {
+        goTo(index + 1);
+        return;
+      }
+
       const nextRun = commitAnswer(run, record);
       setRun(nextRun);
 
@@ -59,12 +75,12 @@ function Scene({ chapterId }: { chapterId: string }) {
       if (nextIndex >= chapter.nodes.length) {
         setOutcome(finishChapter(chapter, nextRun));
       } else {
-        setIndex(nextIndex);
+        setMaxIndex(nextIndex);
+        goTo(nextIndex);
         checkpoint(chapter.id, nextIndex, nextRun);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     },
-    [chapter, commitAnswer, run, index, finishChapter, checkpoint],
+    [chapter, commitAnswer, run, index, maxIndex, goTo, finishChapter, checkpoint],
   );
 
   if (!chapter) return <Navigate to="/levels" replace />;
@@ -90,12 +106,24 @@ function Scene({ chapterId }: { chapterId: string }) {
 
       <div className="scene-progress" aria-label={`Nodo ${index + 1} de ${chapter.nodes.length}`}>
         {chapter.nodes.map((item, position) => (
-          <span
+          <button
             key={item.id}
+            type="button"
             data-state={position < index ? 'done' : position === index ? 'current' : 'todo'}
+            disabled={position > maxIndex}
+            title={position <= maxIndex ? `Ir al paso ${position + 1}` : undefined}
+            aria-label={`Paso ${position + 1} de ${chapter.nodes.length}`}
+            aria-current={position === index ? 'step' : undefined}
+            onClick={() => goTo(position)}
           />
         ))}
       </div>
+
+      {index < maxIndex && (
+        <p className="faint" style={{ fontSize: 13, marginTop: -8 }}>
+          Repaso de un paso ya resuelto: puedes rehacerlo, pero no vuelve a dar XP.
+        </p>
+      )}
 
       {node.kind === 'narrative' && (
         <NarrativeCard key={node.id} node={node as NarrativeNode} onComplete={handleComplete} />
@@ -110,6 +138,29 @@ function Scene({ chapterId }: { chapterId: string }) {
         node.kind === 'writeSentence' ||
         node.kind === 'writeFree') && (
         <WritingCard key={node.id} node={node as WritingNode} combo={run.combo} onComplete={handleComplete} />
+      )}
+
+      {/*
+        Navegación del repaso, debajo del ejercicio: sólo estorbaría arriba, donde
+        lo que se quiere leer es la consigna. «Siguiente» aparece únicamente en los
+        pasos ya resueltos —saltarlo es volver donde se estaba, no adelantar—, y
+        rehacer el ejercicio sigue valiendo para avanzar.
+      */}
+      {(index > 0 || index < maxIndex) && (
+        <div className="scene-nav">
+          {index > 0 ? (
+            <button type="button" className="btn btn-sm" onClick={() => goTo(index - 1)}>
+              ↩ Anterior
+            </button>
+          ) : (
+            <span />
+          )}
+          {index < maxIndex && (
+            <button type="button" className="btn btn-sm" onClick={() => goTo(index + 1)}>
+              Siguiente ↪
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
