@@ -89,6 +89,7 @@ export function ChapterMapScreen() {
                   ))}
                   <span className="chip">hasta {chapterMaxXp(chapter)} XP</span>
                   {state && !done && state.nodeIndex > 0 && <span className="chip">▶ reanudar</span>}
+                  {done && <span className="chip">↻ rejugar</span>}
                 </span>
               </span>
             </button>

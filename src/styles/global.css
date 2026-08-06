@@ -882,23 +882,48 @@ a {
   margin-bottom: 22px;
 }
 
-.scene-progress > span {
+.scene-progress > button {
   flex: 1;
   height: 5px;
+  padding: 0;
+  position: relative;
   border-radius: 1px;
   background: rgba(60, 38, 12, 0.2);
   border: 1px solid rgba(74, 48, 16, 0.2);
 }
 
-.scene-progress > span[data-state='done'] {
+/* El trazo mide 5px: el área pulsable se agranda sin mover el diseño. */
+.scene-progress > button::after {
+  content: '';
+  position: absolute;
+  inset: -9px 0;
+}
+
+.scene-progress > button:disabled {
+  cursor: default;
+}
+
+.scene-progress > button:not(:disabled):hover {
+  border-color: var(--gold);
+}
+
+.scene-progress > button[data-state='done'] {
   background: var(--gold);
   border-color: var(--gold);
 }
 
-.scene-progress > span[data-state='current'] {
+.scene-progress > button[data-state='current'] {
   background: linear-gradient(180deg, #f0d68f, #c9a24a);
   border-color: #8a6a1e;
   box-shadow: 0 0 8px rgba(201, 162, 74, 0.8);
+}
+
+/* Ir y venir por los pasos ya resueltos, al pie del ejercicio. */
+.scene-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* Vitela iluminada: la voz de la historia. */
