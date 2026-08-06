@@ -97,8 +97,24 @@ export interface WritingNode extends BaseNode {
   slots?: string[][];
   rubric?: Rubric;
   placeholder?: string;
+  /**
+   * Ejemplo resuelto del MISMO patrón pero con otro contenido, visible desde el
+   * primer momento y sin coste de XP: en A1 y A2 el jugador aún no sabe qué
+   * forma tiene una respuesta buena, y enseñársela no es regalarle la suya.
+   *
+   * Nunca puede contener la solución: `npm run verify` comprueba que no incluya
+   * ninguna respuesta aceptada y que, en las rúbricas de varios requisitos,
+   * copiarlo tal cual no apruebe.
+   */
+  example?: string;
   /** Pista que se ofrece tras el primer fallo: puede ser un esqueleto. */
   hint?: string;
+  /**
+   * Segunda pista, más explícita que `hint`, para el jugador que sigue atascado
+   * tras el segundo fallo. La alternativa era rendirse, que cuesta el 80% de la
+   * XP y tumba el objetivo de «sin revelar soluciones».
+   */
+  hint2?: string;
   /**
    * Texto ejemplar completo que se muestra al rendirse. Obligatorio en las
    * redacciones libres: la pista es un andamiaje, esto es una respuesta real

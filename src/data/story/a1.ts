@@ -59,7 +59,9 @@ export const A1_CHAPTERS: Chapter[] = [
         prompt: 'She points up. Write the name of what you see.',
         promptEs: 'Señala hacia arriba. Escribe «cielo» en inglés.',
         answers: ['sky', 'the sky'],
+        example: 'Así funciona: Mira señala el suelo → escribes «ground». Señala la lluvia → escribes «rain». Una palabra, en inglés, sin más.',
         hint: 'Tres letras. Empieza por s.',
+        hint2: 'Tres letras y acaba en «y»: s _ y.',
         placeholder: 'una palabra…',
         success: 'The clouds open a little. A thin light falls on the street.',
       },
@@ -71,7 +73,9 @@ export const A1_CHAPTERS: Chapter[] = [
         prompt: 'She points at the building behind her. Write its name.',
         promptEs: 'Señala el edificio donde vive. Escribe «casa» en inglés.',
         answers: ['house', 'a house', 'the house'],
+        example: 'Del mismo modo: señala la tienda → «shop»; señala la calle → «street». Puedes escribir sólo la palabra o con «a» / «the» delante.',
         hint: 'h _ _ _ e',
+        hint2: 'Cinco letras: empieza por «hou-» y acaba en «-se».',
         placeholder: 'una palabra…',
         success: 'A wooden door appears where there was only a wall.',
       },
@@ -85,7 +89,10 @@ export const A1_CHAPTERS: Chapter[] = [
           'Completa con el verbo to be. Escribe las dos palabras separadas por un espacio (ej: "are am").',
         answers: ['is am'],
         slots: [['is'], ['am']],
+        example:
+          'Mismo ejercicio, resuelto: «You ___ tall. We ___ friends.» → escribirías «are are», porque el verbo to be hace I am, you are, he/she/it is, we/they are.',
         hint: 'Tercera persona del singular, y luego la forma de "I".',
+        hint2: 'El primero acompaña a «My name» (he/she/it) y el segundo a «I».',
         placeholder: 'is am',
       },
       {
@@ -103,7 +110,10 @@ export const A1_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
+        example:
+          'Si te llamaras Nora escribirías: «My name is Nora.» — mayúscula al principio, tu nombre en medio y punto al final.',
         hint: 'Estructura: My name is + tu nombre + punto final.',
+        hint2: 'Tres palabras fijas y la tuya: My / name / is / TU NOMBRE. Y el punto.',
         model: 'My name is Alex.',
         placeholder: 'My name is…',
         success: 'The letters glow on the paper. For a second, the rain stops above you.',
@@ -178,7 +188,10 @@ export const A1_CHAPTERS: Chapter[] = [
           'Completa con «a» o «an». Escribe las dos palabras separadas por un espacio.',
         answers: ['an a'],
         slots: [['an'], ['a']],
+        example:
+          'Mismo ejercicio, resuelto: «I have ___ dog and ___ umbrella.» → «a an», porque dog empieza por consonante y umbrella por vocal. Aquí el orden no tiene por qué ser el mismo.',
         hint: '«an» va delante de sonido vocálico.',
+        hint2: 'Apple empieza por vocal y notebook por consonante. En ese orden.',
         placeholder: 'an a',
       },
       {
@@ -189,7 +202,9 @@ export const A1_CHAPTERS: Chapter[] = [
         prompt: 'The baker holds up seven loaves. Write the number in letters.',
         promptEs: 'Escribe el número 7 con letras, en inglés.',
         answers: ['seven'],
+        example: 'Los tienes todos aquí: 1 one, 2 two, 3 three, 4 four, 5 five, 6 six, 8 eight, 9 nine, 10 ten.',
         hint: 'Empieza por s y acaba en -en.',
+        hint2: 'Cinco letras: s _ v _ n.',
         placeholder: 'un número…',
       },
       {
@@ -199,7 +214,9 @@ export const A1_CHAPTERS: Chapter[] = [
         prompt: 'One apple, two ___. Write the plural.',
         promptEs: 'Escribe el plural de «apple».',
         answers: ['apples'],
+        example: 'Igual que: one book → two books; one pen → two pens; one house → two houses.',
         hint: 'Casi todos los plurales regulares acaban en -s.',
+        hint2: 'Es la misma palabra del enunciado con una letra más al final.',
         placeholder: 'plural…',
       },
       {
@@ -217,7 +234,10 @@ export const A1_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'Ejemplo de estructura: I want bread and two apples.',
+        example:
+          'Otro cliente pide lo suyo así: «I want water and three books.» Copia la estructura (I want + una cosa + and + otra cosa), pero pidiendo lo tuyo: el pan y la fruta.',
+        hint: 'Empieza por «I want», nombra el pan y luego la fruta, y cierra con punto.',
+        hint2: 'Rellena esto: I want ______ and two ______. (pan y manzanas)',
         model: 'I want bread and two apples.',
         placeholder: 'I want…',
         success: 'The baker laughs and puts the bread in your bag. It is warm.',
@@ -250,7 +270,10 @@ export const A1_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'He is an old man with a blue hat.',
+        example:
+          'Así se describe al panadero: «He is a young man with a white apron.» Mismo molde para el librero, cambiando la edad y el color.',
+        hint: 'Empieza por «He is», di que es «old» y termina mencionando el sombrero «blue».',
+        hint2: 'Rellena esto: He is an ______ man with a ______ hat. (viejo, azul)',
         model: 'He is an old man with a blue hat.',
         placeholder: 'He is…',
       },
@@ -306,7 +329,10 @@ export const A1_CHAPTERS: Chapter[] = [
         prompt: 'She ___ in the library. (work)',
         promptEs: 'Conjuga «work» en presente simple para «she». Escribe sólo el verbo.',
         answers: ['works'],
+        example:
+          'Mismo ejercicio, resuelto: «He ___ in the market. (live)» → «lives». Con I / you / we / they el verbo va tal cual (I live), pero con he / she / it lleva -s.',
         hint: 'Con he/she/it el verbo lleva -s.',
+        hint2: 'Es «work» más una letra al final.',
         placeholder: 'verbo…',
       },
       {
@@ -316,7 +342,10 @@ export const A1_CHAPTERS: Chapter[] = [
         prompt: '___ you live in Lumen?',
         promptEs: 'Completa la pregunta con el auxiliar correcto. Una sola palabra.',
         answers: ['do'],
+        example:
+          'Mismo ejercicio, resuelto: «___ she work here?» → «Does», porque es «she». Con I / you / we / they el auxiliar es el otro.',
         hint: 'Con «you» el auxiliar del presente simple es…',
+        hint2: 'Dos letras, y es el mismo verbo que significa «hacer».',
         placeholder: 'auxiliar…',
       },
       {
@@ -332,7 +361,10 @@ export const A1_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
+        example:
+          'Otro viajero escribió: «I live in Lisbon.» Otra: «I live in a small village near the sea.» Basta con la fórmula y tu sitio.',
         hint: 'I live in + ciudad.',
+        hint2: 'Cuatro palabras bastan: I / live / in / TU CIUDAD. Mayúscula al empezar y punto al acabar.',
         model: 'I live in Lumen.',
         placeholder: 'I live in…',
       },
@@ -353,7 +385,10 @@ export const A1_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'I have one sister and two brothers.',
+        example:
+          'Otro viajero escribió: «I have two dogs and one grandmother.» El molde es ese: I have + cuántos + quién.',
+        hint: 'Empieza por «I have» y usa una palabra de familia: mother (madre), father (padre), sister (hermana), brother (hermano), parents (padres).',
+        hint2: 'Rellena esto: I have one ______ and two ______. (con palabras de familia)',
         model: 'I have one sister and two brothers.',
         placeholder: 'I have…',
       },
@@ -389,7 +424,11 @@ export const A1_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
+        example:
+          'Una redacción de otro viajero, más corta que la que se te pide: «I am Tomas and I come from the north. I work with horses.» Le falta la tercera frase, la de lo que le gusta: la tuya tiene que llevar las tres.',
         hint: 'Estructura: My name is… / I live in… / I like…',
+        hint2:
+          'Tres frases, una detrás de otra: 1) My name is ______. 2) I live in ______. 3) I like ______. Alarga cada una con un detalle hasta llegar a 20 palabras.',
         model:
           'My name is Ana and I am from Spain. I live in Madrid with my sister. I work in a small hospital near the park. I like old books and long walks in the rain.',
         placeholder: 'My name is…',

@@ -24,7 +24,8 @@ export function WritingCard({
   const [attempts, setAttempts] = useState(0);
   const [result, setResult] = useState<GradeResult | null>(null);
   const [revealed, setRevealed] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  /** Cuántas pistas de la escalera se han pedido. */
+  const [hintsShown, setHintsShown] = useState(0);
 
   const solved = result?.grade === 'perfect';
   const words = wordCount(value);
@@ -33,16 +34,22 @@ export function WritingCard({
   /** La solución modelo: el texto ejemplar, la primera respuesta válida o, en último caso, la pista. */
   const model = useMemo(() => node.model ?? node.answers?.[0] ?? node.hint ?? '', [node]);
 
+  /** Pistas de menos a más explícitas. La segunda evita tener que rendirse. */
+  const hints = useMemo(
+    () => [node.hint, node.hint2].filter((hint): hint is string => Boolean(hint)),
+    [node],
+  );
+
   // Se puede seguir si está perfecto, si tras dos intentos está "casi", o si se rindió.
   const canAdvance = solved || revealed || (result?.grade === 'close' && attempts >= 2);
   const canReveal = !solved && !revealed && attempts >= 2 && Boolean(model);
+  // Cada pista nueva pide un intento más: la ayuda acompaña, no sustituye.
+  const canAskHint = !solved && !revealed && hintsShown < hints.length && attempts > hintsShown;
 
   function submit() {
     if (!value.trim() || solved || revealed) return;
-    const nextAttempts = attempts + 1;
-    setAttempts(nextAttempts);
+    setAttempts(attempts + 1);
     setResult(gradeWriting(node, value));
-    if (!showHint && nextAttempts >= 1) setShowHint(false);
   }
 
   function reveal() {
@@ -57,7 +64,7 @@ export function WritingCard({
       grade: revealed ? 'wrong' : graded.grade,
       attempts: Math.max(1, attempts),
       revealed,
-      usedHint: showHint,
+      usedHint: hintsShown > 0,
       xp: computeXp(node.xp, graded, Math.max(1, attempts), revealed),
       words,
     });
@@ -71,6 +78,13 @@ export function WritingCard({
         </p>
         {node.promptEs && <p className="prompt-es">{node.promptEs}</p>}
       </div>
+
+      {node.example && (
+        <div className="example-box">
+          <strong>Ejemplo</strong>
+          <p>{node.example}</p>
+        </div>
+      )}
 
       {node.multiline ? (
         <textarea
@@ -117,11 +131,12 @@ export function WritingCard({
         </span>
       </div>
 
-      {showHint && node.hint && !revealed && (
-        <div className="hint-box">
-          <strong>Pista:</strong> {node.hint}
-        </div>
-      )}
+      {!revealed &&
+        hints.slice(0, hintsShown).map((hint, index) => (
+          <div className="hint-box" key={index}>
+            <strong>{hints.length > 1 ? `Pista ${index + 1}:` : 'Pista:'}</strong> {hint}
+          </div>
+        ))}
 
       {result && (
         <div className="feedback" data-grade={revealed ? 'wrong' : result.grade}>
@@ -164,9 +179,9 @@ export function WritingCard({
           </button>
         )}
 
-        {!solved && !revealed && node.hint && attempts >= 1 && !showHint && (
-          <button type="button" className="btn btn-sm" onClick={() => setShowHint(true)}>
-            Ver pista (−30% XP)
+        {canAskHint && (
+          <button type="button" className="btn btn-sm" onClick={() => setHintsShown(hintsShown + 1)}>
+            {hintsShown === 0 ? 'Ver pista' : 'Ver otra pista'}
           </button>
         )}
 

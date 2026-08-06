@@ -44,7 +44,10 @@ export const A2_CHAPTERS: Chapter[] = [
           'Pon los dos verbos en pasado simple. Escríbelos separados por un espacio.',
         answers: ['broke took'],
         slots: [['broke'], ['took']],
+        example:
+          'Mismo ejercicio, resuelto: «She ___ the door and ___ my hand. (open / hold)» → «opened held». El regular añade -ed; el irregular cambia por dentro y hay que sabérselo.',
         hint: 'Los dos son irregulares: break → br___, take → t___.',
+        hint2: 'Break se convierte en «broke». Take sigue el mismo camino que shake → shook.',
         placeholder: 'broke took',
       },
       {
@@ -56,7 +59,10 @@ export const A2_CHAPTERS: Chapter[] = [
           'Completa con «there was» o «there were» (en ese orden, separados por coma).',
         answers: ['there were, there was', 'there were there was'],
         slots: [['there were'], ['there was']],
+        example:
+          'Mismo ejercicio, resuelto: «___ a horse in the yard and ___ two men at the door.» → «there was, there were». Singular → was; plural → were.',
         hint: 'Plural primero (three candles), singular después (no light).',
+        hint2: 'Aquí van al revés que en el ejemplo: primero el plural y después el singular.',
         placeholder: 'there were, there was',
       },
       {
@@ -75,7 +81,10 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'Last night I arrived in Blackmill and I slept in the old inn.',
+        example:
+          'Así declaró el herrero: «Yesterday evening I closed the forge and I ate with my brother.» Fíjate en los verbos: closed, ate. Ninguno va en presente.',
+        hint: 'Empieza por «Last night» y sigue con un verbo en pasado: I arrived, I slept, I walked, I was…',
+        hint2: 'Rellena esto: Last night I ______ in Blackmill and I ______ in the old inn. (llegué, dormí)',
         model: 'Last night I arrived in Blackmill and I slept in the old inn.',
         placeholder: 'Last night I…',
         multiline: true,
@@ -108,7 +117,10 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'Why did you not get up? / What did you hear?',
+        example:
+          'Las preguntas en pasado se montan igual: palabra wh- + did + sujeto + verbo en infinitivo. «When did the rain start?» «Where did you sleep?» Ojo: detrás de «did» el verbo va sin -ed.',
+        hint: 'Empieza por what, why, when, where, who o how, sigue con «did you» y cierra con «?».',
+        hint2: 'Rellena esto: What did you ______ last night? (oír, ver, hacer…)',
         model: 'What did you hear last night?',
         placeholder: 'Why did…',
       },
@@ -130,7 +142,11 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
+        example:
+          'Un informe de otro caso, a medias, para que veas cómo encajan los conectores: «At first, the dogs barked in the yard. Later, somebody opened the gate and walked to the barn. The horses were gone before sunrise.» A ese informe le falta el remate: el tuyo sí tiene que cerrar con un conector de final.',
         hint: 'Ordena los hechos: First, … Then, … Finally, …',
+        hint2:
+          'Escribe cuatro frases siguiendo este orden: First, ______. Then, ______. After that, ______. Finally, ______. Cuenta lo de la ventana, la llave, la lluvia y la huida.',
         model:
           'First, someone came to the archive after midnight and broke the small window at the back. Then the thief walked to the desk, opened the wooden box and took the iron key. After that, the rain started and covered the tracks in the mud. Finally, the stranger left the village on a horse before the sun came up.',
         placeholder: 'First, …',
@@ -177,7 +193,9 @@ export const A2_CHAPTERS: Chapter[] = [
         prompt: 'The blacksmith is ___ than the baker. (tall)',
         promptEs: 'Escribe el comparativo de «tall». Sólo esa palabra.',
         answers: ['taller'],
+        example: 'Mismo ejercicio, resuelto: «The river is ___ than the road. (long)» → «longer». Corto + -er.',
         hint: 'Adjetivo corto + -er.',
+        hint2: 'Es «tall» con dos letras más al final.',
         placeholder: 'comparativo…',
       },
       {
@@ -187,7 +205,10 @@ export const A2_CHAPTERS: Chapter[] = [
         prompt: 'This story is ___ than the first one. (interesting)',
         promptEs: 'Comparativo de «interesting». Escribe las dos palabras.',
         answers: ['more interesting'],
+        example:
+          'Mismo ejercicio, resuelto: «This road is ___ than the other one. (dangerous)» → «more dangerous». Los adjetivos de tres sílabas o más no admiten -er.',
         hint: 'Adjetivo largo: no lleva -er, lleva otra palabra delante.',
+        hint2: 'Dos palabras: la misma que en el ejemplo, y detrás «interesting» tal cual.',
         placeholder: 'more…',
       },
       {
@@ -209,7 +230,11 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'He was tall and had dark hair. He wore a long black coat.',
+        example:
+          'Así describió el posadero a otro cliente: «She was short and thin. She had a red scarf and old boots.» Ese es el molde: primero cómo era, luego lo que llevaba puesto.',
+        hint: 'Tres piezas: «was» para la altura, «hair» para el pelo y «wore» / «had» para la ropa.',
+        hint2:
+          'Rellena esto: He was ______ and had ______ hair. He wore ______. (alto; oscuro; un abrigo negro largo)',
         model: 'He was tall and had dark hair. He wore a long black coat.',
         placeholder: 'He was…',
         multiline: true,
@@ -242,7 +267,10 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'Witness 5 is less reliable than witness 6.',
+        example:
+          'Comparaciones ya hechas: «The constable is older than the baker.» «This witness is more useful than the others.» «Witness 3 is less sure than witness 1.» Siempre: A + is + comparativo + than + B.',
+        hint: 'Usa el molde A is … than B, con un comparativo en medio (taller, older, more reliable, less sure).',
+        hint2: 'Rellena esto: Witness ___ is more reliable than witness ___. (elige dos números)',
         model: 'Witness 5 is less reliable than witness 6.',
         placeholder: 'Witness … is … than …',
       },
@@ -268,7 +296,11 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
+        example:
+          'Un cartel viejo que sigue clavado en la puerta de la posada: «Wanted. A woman with grey eyes and a scar on her left hand. She travels with two horses and pays with foreign coins. Speak to the constable.» Le falta casi todo lo que a ti te piden: ni edad, ni ropa, ni dónde se la vio.',
         hint: 'Empieza por «Wanted…», describe con «was» y «wore», y cierra con «was last seen…».',
+        hint2:
+          'Tres bloques: 1) Wanted. The person is ______ (tall/short/young/old). 2) He wore ______. 3) He was last seen ______. Alarga cada bloque con detalles hasta 45 palabras.',
         model:
           'Wanted by the constable of Blackmill. The person we are looking for is a tall young man with dark hair and a thin face. He wore a long black coat with no buttons and heavy boots. He was last seen near the old bridge at midnight, walking towards the river. Anyone with information must speak to Constable Hale.',
         placeholder: 'WANTED. A…',
@@ -315,7 +347,10 @@ export const A2_CHAPTERS: Chapter[] = [
           'Completa: primero una dirección (left/right) y luego una preposición que signifique «al otro lado de». Separadas por un espacio.',
         answers: ['left across', 'right across'],
         slots: [['left', 'right'], ['across']],
+        example:
+          'Mismo ejercicio, resuelto: «Turn ___ at the inn. The well is ___ the church.» → «left behind», o «right behind»: en el primer hueco vale cualquiera de las dos direcciones, en el segundo sólo la preposición correcta.',
         hint: 'La segunda palabra aparece en el glosario del texto anterior.',
+        hint2: 'Primer hueco: left o right, la que quieras. Segundo: la que significa «al otro lado de», empieza por «a».',
         placeholder: 'left across',
       },
       {
@@ -325,7 +360,10 @@ export const A2_CHAPTERS: Chapter[] = [
         prompt: 'I ___ walk to the mill tonight. (going to)',
         promptEs: 'Completa con el futuro «going to» para «I». Escribe las tres palabras.',
         answers: ['am going to'],
+        example:
+          'Mismo ejercicio, resuelto: «She ___ sleep here tonight.» → «is going to». Con «she» toca «is»; con «they», «are going to».',
         hint: 'Verbo to be + going to.',
+        hint2: 'Con «I» el verbo to be sólo tiene una forma. Ésa, y detrás «going to».',
         placeholder: 'am going to',
       },
       {
@@ -343,7 +381,10 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
-        hint: 'Excuse me, how do I get to the mill?',
+        example:
+          'Otro viajero preguntó por la posada así: «Excuse me, how do I get to the inn?» Y también vale: «Could you tell me the way to the bridge?»',
+        hint: 'Empieza por «Excuse me», sigue con «how do I get to…» y termina con el sitio y «?».',
+        hint2: 'Rellena esto: Excuse me, how do I get to the ______? (el molino)',
         model: 'Excuse me, how do I get to the mill?',
         placeholder: 'Excuse me, how…',
       },
@@ -383,7 +424,11 @@ export const A2_CHAPTERS: Chapter[] = [
           requireCapitalStart: true,
           requireFinalPunctuation: true,
         },
+        example:
+          'Unas indicaciones más cortas, para ver el molde: «Go past the forge and walk along the wall. The bakery is next to the well, opposite a red door.» Fíjate en los imperativos (go, walk) y en las preposiciones (along, next to, opposite). A las tuyas les falta además enlazar los pasos en el tiempo.',
         hint: 'Encadena pasos: Take… behind… / Walk along… until… / Turn right…',
+        hint2:
+          'Cuatro pasos, uno por frase: 1) Take the road ______ (behind/along). 2) Do not cross ______. 3) Walk ______ until you see ______. 4) Turn right and the mill is ______ (opposite/next to).',
         model:
           'Take the narrow road behind the church and leave the market on your left. Do not cross the first bridge, because it is broken and dangerous. Walk along the river for about twenty minutes until you see a dead tree with white branches. Turn right there and follow the path up the hill. The old mill is opposite an empty house with no roof.',
         placeholder: 'Take the road…',
