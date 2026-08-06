@@ -1,10 +1,11 @@
 import type { Grade, Rubric, WritingNode } from '@/types';
 import {
-  containsPhrase,
+  containsPhraseAny,
   containsPhraseLoose,
-  levenshtein,
+  editDistance,
   normalize,
   normalizeLoose,
+  normalizeVariants,
   typoTolerance,
   wordCount,
 } from './text';
@@ -50,32 +51,39 @@ export function gradeWriting(node: WritingNode, raw: string): GradeResult {
 }
 
 function gradeAgainstAnswers(answers: string[], input: string, rubric?: Rubric): GradeResult {
-  const normalizedInput = normalize(input);
+  // Una contracción ambigua da varias lecturas de lo escrito y de la respuesta
+  // esperada («he's got» / «he has got»): basta con que se crucen en una.
+  const written = normalizeVariants(input);
   const notes: string[] = [];
 
   let bestDistance = Infinity;
   let closest = answers[0];
+  let closestTarget = normalize(answers[0]);
 
   for (const answer of answers) {
-    const target = normalize(answer);
-    if (normalizedInput === target) {
-      notes.push(...styleNotes(input, rubric));
-      const clean = notes.length === 0;
-      return {
-        grade: clean ? 'perfect' : 'close',
-        ratio: clean ? 1 : 0.7,
-        notes: clean ? ['¡Exacto!'] : notes,
-        model: answers[0],
-      };
-    }
-    const distance = levenshtein(normalizedInput, target);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      closest = answer;
+    for (const target of normalizeVariants(answer)) {
+      if (written.includes(target)) {
+        notes.push(...styleNotes(input, rubric));
+        const clean = notes.length === 0;
+        return {
+          grade: clean ? 'perfect' : 'close',
+          ratio: clean ? 1 : 0.7,
+          notes: clean ? ['¡Exacto!'] : notes,
+          model: answers[0],
+        };
+      }
+      for (const variant of written) {
+        const distance = editDistance(variant, target);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          closest = answer;
+          closestTarget = target;
+        }
+      }
     }
   }
 
-  if (bestDistance <= typoTolerance(normalize(closest))) {
+  if (bestDistance <= typoTolerance(closestTarget)) {
     return {
       grade: 'close',
       ratio: 0.6,
@@ -124,7 +132,16 @@ function tokenSize(value: string): number {
  * pero el hueco sigue sin darse por bueno.
  */
 function gradeAgainstSlots(slots: string[][], input: string, fallback?: string): GradeResult {
-  const tokens = normalize(input).split(' ').filter(Boolean);
+  // Cada lectura de las contracciones ambiguas reparte los tokens de otra
+  // manera, así que se corrigen todas y se conserva la que más huecos acierta.
+  return normalizeVariants(input)
+    .map((variant) => gradeSlotsOnce(slots, variant, fallback))
+    .reduce((best, result) => (result.ratio > best.ratio ? result : best));
+}
+
+/** Una pasada de corrección sobre una lectura ya normalizada. */
+function gradeSlotsOnce(slots: string[][], normalized: string, fallback?: string): GradeResult {
+  const tokens = normalized.split(' ').filter(Boolean);
   const checklist: Array<{ label: string; met: boolean }> = [];
   const notes: string[] = [];
   let cursor = 0;
@@ -161,9 +178,9 @@ function gradeAgainstSlots(slots: string[][], input: string, fallback?: string):
     checklist.push({ label: `${capitalize(label)}: «${written}»`, met: false });
 
     const closest = accepted.reduce((best, variant) =>
-      levenshtein(written, variant) < levenshtein(written, best) ? variant : best,
+      editDistance(written, variant) < editDistance(written, best) ? variant : best,
     );
-    const isTypo = closest.length >= 5 && levenshtein(written, closest) <= typoTolerance(closest);
+    const isTypo = editDistance(written, closest) <= typoTolerance(closest);
 
     notes.push(
       isTypo
@@ -190,7 +207,7 @@ function gradeAgainstSlots(slots: string[][], input: string, fallback?: string):
 }
 
 function gradeAgainstRubric(rubric: Rubric, input: string): GradeResult {
-  const normalizedInput = normalize(input);
+  const inputVariants = normalizeVariants(input);
   const words = wordCount(input);
   const checklist: Array<{ label: string; met: boolean }> = [];
   const notes: string[] = [];
@@ -207,7 +224,7 @@ function gradeAgainstRubric(rubric: Rubric, input: string): GradeResult {
   }
 
   rubric.requiredKeywords?.forEach((group, index) => {
-    const met = group.some((variant) => containsPhrase(normalizedInput, variant));
+    const met = group.some((variant) => containsPhraseAny(inputVariants, variant));
     const label = rubric.checklist?.[index] ?? `Usa: ${group.join(' / ')}`;
     checklist.push({ label, met });
     if (!met) notes.push(`Falta este recurso: ${label.toLowerCase()}.`);
