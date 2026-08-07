@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { GlossText } from '@/components/GlossText';
+import { XpStake } from '@/components/XpStake';
 import { computeXp, gradeWriting, type GradeResult } from '@/engine/grading';
 import type { AnswerRecord } from '@/engine/progress';
 import { wordCount } from '@/engine/text';
@@ -30,6 +31,20 @@ export function WritingCard({
   const solved = result?.grade === 'perfect';
   const words = wordCount(value);
   const minWords = node.rubric?.minWords;
+  const maxWords = node.rubric?.maxWords;
+  const hasLimits = minWords !== undefined || maxWords !== undefined;
+
+  /** Palabras de más sobre el máximo. Se cuenta mientras se teclea, no al enviar. */
+  const overBy = maxWords !== undefined ? Math.max(0, words - maxWords) : 0;
+  // Se avisa desde el 90% del máximo: da margen para cerrar la frase antes de pasarse.
+  const nearMax = maxWords !== undefined && !overBy && words >= Math.ceil(maxWords * 0.9);
+  const countState = overBy
+    ? 'over'
+    : nearMax
+      ? 'near'
+      : minWords !== undefined && words >= minWords
+        ? 'ok'
+        : undefined;
 
   /** La solución modelo: el texto ejemplar, la primera respuesta válida o, en último caso, la pista. */
   const model = useMemo(() => node.model ?? node.answers?.[0] ?? node.hint ?? '', [node]);
@@ -42,6 +57,8 @@ export function WritingCard({
 
   // Se puede seguir si está perfecto, si tras dos intentos está "casi", o si se rindió.
   const canAdvance = solved || revealed || (result?.grade === 'close' && attempts >= 2);
+  /** XP que se lleva quien continúe ahora mismo, con el resultado que tenga. */
+  const gain = result ? computeXp(node.xp, result, Math.max(1, attempts), revealed) : 0;
   const canReveal = !solved && !revealed && attempts >= 2 && Boolean(model);
   // Cada pista nueva pide un intento más: la ayuda acompaña, no sustituye.
   const canAskHint = !solved && !revealed && hintsShown < hints.length && attempts > hintsShown;
@@ -116,20 +133,38 @@ export function WritingCard({
       )}
 
       <div className="writer-meta">
-        <span>
-          {minWords !== undefined ? (
-            <>
-              {words} / {minWords} palabras{node.rubric?.maxWords ? ` (máx. ${node.rubric.maxWords})` : ''}
-            </>
-          ) : (
-            <>Vale {node.xp} XP · intento {Math.max(1, attempts)}</>
-          )}
-        </span>
+        {hasLimits ? (
+          <span className="word-count" data-state={countState}>
+            {words}
+            {minWords !== undefined && ` / ${minWords}`} palabras
+            {maxWords !== undefined && ` · máx. ${maxWords}`}
+            {overBy > 0 && <span className="over-pill">+{overBy}</span>}
+          </span>
+        ) : (
+          <span />
+        )}
         <span className="row" style={{ gap: 8 }}>
           {combo >= 2 && <span className="combo-pill">🔥 racha ×{combo}</span>}
           {node.multiline && <span className="faint">⌘/Ctrl + Enter para enviar</span>}
         </span>
       </div>
+
+      {/* El aviso salta mientras se escribe, no al corregir: el texto es fijo a
+          propósito —lo dicta un `role="status"`— y las palabras de más se cuentan
+          arriba, en el contador. */}
+      {overBy > 0 && !solved && !revealed && (
+        <p className="limit-warning" role="status">
+          Te has pasado del máximo de {maxWords} palabras. Recorta antes de comprobar: pasarse
+          cuenta como requisito incumplido y te gasta un intento.
+        </p>
+      )}
+
+      <XpStake
+        base={node.xp}
+        attempts={attempts}
+        revealed={revealed}
+        earned={solved || revealed ? gain : undefined}
+      />
 
       {!revealed &&
         hints.slice(0, hintsShown).map((hint, index) => (
@@ -193,7 +228,7 @@ export function WritingCard({
 
         {canAdvance && (
           <button type="button" className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={finish}>
-            Continuar {solved && <span className="xp-float">+{computeXp(node.xp, result!, Math.max(1, attempts), false)} XP</span>}
+            Continuar <span className={solved ? 'xp-float' : 'xp-gain'}>+{gain} XP</span>
           </button>
         )}
       </div>
