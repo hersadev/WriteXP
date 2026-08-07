@@ -1233,10 +1233,166 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   font-family: var(--sans);
   font-size: 12.5px;
   color: var(--faint);
+}
+
+/* ---------- Contador de palabras ---------- */
+
+/* Cambia de color mientras se teclea: cumplido, rozando el máximo, pasado. */
+.word-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.15s ease;
+}
+
+.word-count[data-state='ok'] {
+  color: var(--forest);
+}
+
+.word-count[data-state='near'] {
+  color: var(--ochre);
+}
+
+.word-count[data-state='over'] {
+  color: var(--blood);
+  font-weight: 700;
+}
+
+.over-pill {
+  padding: 2px 7px;
+  border-radius: 1px;
+  border: 1px solid rgba(143, 34, 34, 0.45);
+  background: rgba(143, 34, 34, 0.12);
+  color: var(--blood);
+  font-family: var(--serif);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.limit-warning {
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(143, 34, 34, 0.35);
+  border-left: 4px solid var(--blood);
+  background: rgba(143, 34, 34, 0.08);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #6d1c1c;
+}
+
+/* ---------- XP en juego ---------- */
+
+.xp-stake {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+.xp-stake-label {
+  font-family: var(--serif);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.xp-stake-value {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--gold);
+  animation: stakeTick 0.5s ease;
+}
+
+.xp-stake[data-state='reduced'] .xp-stake-value,
+.xp-stake[data-state='revealed'] .xp-stake-value {
+  color: var(--blood);
+}
+
+.xp-stake[data-state='settled'] .xp-stake-value {
+  color: var(--forest);
+}
+
+/* El botín completo, tachado, para que se vea de dónde se ha caído. */
+.xp-stake-base {
+  text-decoration: line-through;
+  text-decoration-color: rgba(122, 101, 71, 0.6);
+}
+
+.xp-ladder {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.xp-step {
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: rgba(122, 101, 71, 0.7);
+}
+
+.xp-step + .xp-step::before {
+  content: '→';
+  margin-right: 5px;
+  color: rgba(122, 101, 71, 0.45);
+}
+
+/* Los peldaños ya quemados no vuelven: se tachan. */
+.xp-step[data-state='spent'] {
+  text-decoration: line-through;
+  color: rgba(143, 34, 34, 0.55);
+}
+
+.xp-step[data-state='active'] {
+  padding: 2px 7px;
+  border: 1px solid var(--edge-strong);
+  border-radius: 1px;
+  background: rgba(138, 106, 30, 0.14);
+  color: var(--gold);
+  font-weight: 700;
+}
+
+@keyframes stakeTick {
+  0% {
+    transform: translateY(-3px);
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.xp-gain {
+  font-weight: 700;
+  color: #2a1c05;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .combo-pill {

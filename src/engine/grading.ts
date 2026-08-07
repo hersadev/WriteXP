@@ -377,11 +377,26 @@ function styleNotes(input: string, rubric?: Rubric): string[] {
 }
 
 /**
+ * Cuánto vale una respuesta según el intento en el que llega. La escala vive
+ * aquí y no duplicada en la interfaz: `XpStake` la pinta antes de enviar para
+ * que la penalización se vea venir, no se descubra al final.
+ */
+export const ATTEMPT_MULTIPLIERS = [1, 0.7, 0.45];
+
+/** Rendirse y leer la solución deja una décima parte larga del botín. */
+export const REVEAL_MULTIPLIER = 0.2;
+
+/** Multiplicador del intento `attempts` (1 = el primero); a partir del tercero no baja más. */
+export function attemptMultiplier(attempts: number): number {
+  const step = Math.min(Math.max(attempts, 1), ATTEMPT_MULTIPLIERS.length);
+  return ATTEMPT_MULTIPLIERS[step - 1];
+}
+
+/**
  * XP final del nodo: la respuesta perfecta a la primera vale el 100%,
  * y cada intento o ayuda extra descuenta.
  */
 export function computeXp(base: number, result: GradeResult, attempts: number, revealed: boolean): number {
-  if (revealed) return Math.round(base * 0.2);
-  const attemptPenalty = attempts === 1 ? 1 : attempts === 2 ? 0.7 : 0.45;
-  return Math.max(0, Math.round(base * result.ratio * attemptPenalty));
+  if (revealed) return Math.round(base * REVEAL_MULTIPLIER);
+  return Math.max(0, Math.round(base * result.ratio * attemptMultiplier(attempts)));
 }

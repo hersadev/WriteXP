@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { GlossText } from '@/components/GlossText';
+import { XpStake } from '@/components/XpStake';
 import { computeXp } from '@/engine/grading';
 import type { AnswerRecord } from '@/engine/progress';
 import type { ChoiceNode, ChoiceOption } from '@/types';
@@ -22,6 +23,16 @@ export function ChoiceCard({
   const [chosen, setChosen] = useState<ChoiceOption | null>(null);
 
   const settled = chosen !== null && (!isQuiz || chosen.correct === true);
+
+  // La comprensión lectora paga como la escritura: acertar a la segunda cuesta
+  // XP. Se calcula aquí para que el marcador y lo que se cobra sean el mismo número.
+  const grade = !isQuiz || attempts <= 1 ? 'perfect' : 'close';
+  const quizXp = computeXp(
+    node.xp,
+    { grade, ratio: grade === 'perfect' ? 1 : 0.7, notes: [] },
+    Math.max(1, attempts),
+    false,
+  );
 
   function select(option: ChoiceOption) {
     if (settled) return;
@@ -50,16 +61,13 @@ export function ChoiceCard({
   }
 
   function finish() {
-    const grade = !isQuiz ? 'perfect' : attempts === 1 ? 'perfect' : 'close';
     onComplete({
       nodeId: node.id,
       grade,
       attempts: Math.max(1, attempts),
       revealed: false,
       usedHint: false,
-      xp: isQuiz
-        ? computeXp(node.xp, { grade, ratio: grade === 'perfect' ? 1 : 0.7, notes: [] }, Math.max(1, attempts), false)
-        : node.xp,
+      xp: isQuiz ? quizXp : node.xp,
       words: 0,
       scored: isQuiz,
     });
@@ -96,6 +104,8 @@ export function ChoiceCard({
           </button>
         ))}
       </div>
+
+      {isQuiz && <XpStake base={node.xp} attempts={attempts} earned={settled ? quizXp : undefined} />}
 
       {chosen?.feedback && (
         <div className="feedback" data-grade={!isQuiz ? 'perfect' : chosen.correct ? 'perfect' : 'wrong'}>
