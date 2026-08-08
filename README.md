@@ -76,12 +76,54 @@ respuesta aceptada. El enunciado en inglés ambienta el ejercicio sin nombrar lo
 escribir («holds up 7 loaves», no «seven loaves»); el placeholder, que se lee gratis dentro del
 recuadro, dice **de qué forma se responde** («dos palabras…», «conector…»), nunca con qué palabras.
 
+## Repaso espaciado
+
+En la campaña cada nodo se ve una vez. Sin repaso, fallar un ejercicio salía barato: cobrabas menos
+XP y no volvías a verlo nunca, así que el error se quedaba contigo. Ahora **todo lo que no sale a la
+primera y limpio entra en una cola** y vuelve días después, ya fuera de su capítulo.
+
+El algoritmo ([src/engine/review.ts](src/engine/review.ts)) es una **caja de Leitner**, no un SM-2:
+sin factor de facilidad ni autoevaluación. Aquí la nota no la pone el jugador, la pone el corrector.
+
+| Escalón | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| Vuelve en | 1 día | 3 días | 7 días | 16 días | 35 días |
+
+- **Acertar a la primera** sube un escalón. Superar el último saca el nodo de la cola: ya te lo sabes.
+- **Acertar al segundo intento** cuenta como «casi»: no sube, pero tampoco derrumba.
+- **Fallar o rendirse** lo devuelve al primer escalón y suma una caída, que es lo que distingue lo
+  que se te resiste de verdad de lo que fallaste una tarde.
+
+Un repaso paga el **35%** de la XP del nodo, con las mismas penalizaciones por intento. Se escala en
+la base y no al final, para que el número que anuncia la tarjeta antes de responder sea exactamente
+el que se cobra. Que la XP se repita no permite granjearla: el nodo desaparece de la cola hasta que
+vuelva a vencer, y cada acierto lo aleja más.
+
+Los repasos se cuentan aparte de las respuestas de campaña (`stats.reviewsDone`), porque la precisión
+mide cómo vas leyendo la historia por primera vez y mezclarla con lo que ya fallaste la falsearía.
+Una sesión sirve como mucho 12 ejercicios: una cola de cuarenta no se repasa, se abandona.
+
+## Introducción
+
+Quien llega de una app de botones espera tocar la respuesta, y aquí hay que teclearla: sin avisar,
+la primera pantalla en blanco se lee como una app rota. La introducción
+([src/screens/IntroScreen.tsx](src/screens/IntroScreen.tsx)) sale sola la primera vez y se puede
+volver a ver desde «¿Cómo se juega?». Seis pasos: qué es esto, **un ejercicio real que se resuelve
+ahí mismo**, la escalera de ayudas con su coste en XP, el glosario, el repaso espaciado y el mapa de
+actos.
+
+El segundo paso no es una maqueta: es un `WritingNode` de verdad
+([src/data/onboarding.ts](src/data/onboarding.ts)) corregido por el mismo motor y pintado con la
+misma tarjeta, sólo que con `xp: 0` —la tarjeta esconde el marcador cuando no hay nada en juego, y
+regalar XP aquí descuadraría la curva de niveles—. `npm run verify` le exige lo mismo que a un nodo
+de A1: ejemplo, dos pistas, solución, y que no regale la respuesta en el enunciado.
+
 ## Objetivos y logros
 
 - **Objetivos** (por capítulo): terminarlo, acertar N a la primera, no revelar soluciones, escribir
   N palabras, encadenar una racha. Son metas ambiciosas, no requisitos: los pendientes se acumulan
   y se pueden conseguir repitiendo el capítulo.
-- **Logros** (globales, 16): definidos en [src/data/achievements.ts](src/data/achievements.ts) como
+- **Logros** (globales, 19): definidos en [src/data/achievements.ts](src/data/achievements.ts) como
   un predicado sobre el progreso. Añadir uno nuevo es añadir un objeto al array.
 
 ## Arquitectura
@@ -93,17 +135,19 @@ src/
     text.ts               Normalización, distancia de edición, glosario
     grading.ts            Corrección por respuestas y por rúbrica
     xp.ts                 Curva de niveles y títulos de héroe
+    review.ts             Repaso espaciado (cajas de Leitner)
     progress.ts           Progreso, objetivos, logros, desbloqueos
   data/
     levels.ts             Los cuatro actos
     achievements.ts       Logros
+    onboarding.ts         Contenido de la introducción
     story/                a1 · a2 · b1 · b2 — el contenido
   services/
     auth.ts               Interfaz AuthService + implementación local
     storage.ts            Persistencia del progreso por usuario
   state/                  AuthContext · GameContext
   components/             GlossText, HeroBar, avisos y tarjetas de nodo
-  screens/                Login · Niveles · Capítulos · Escena · Logros
+  screens/                Login · Intro · Niveles · Capítulos · Escena · Repaso · Logros
 ```
 
 Dos reglas que conviene mantener:
@@ -115,7 +159,7 @@ Dos reglas que conviene mantener:
 
 ## Verificación
 
-`npm run verify` ejecuta dos scripts que comprueban el juego sin abrir el navegador:
+`npm run verify` ejecuta tres scripts que comprueban el juego sin abrir el navegador:
 
 - [scripts/verify-content.ts](scripts/verify-content.ts) — ids únicos, nodos corregibles, objetivos
   alcanzables y, sobre todo, que **la solución modelo de cada ejercicio aprueba su propia rúbrica**.
@@ -124,6 +168,9 @@ Dos reglas que conviene mantener:
   regalen la respuesta**.
 - [scripts/simulate-playthrough.ts](scripts/simulate-playthrough.ts) — juega los 12 capítulos
   respondiendo perfecto y comprueba XP, objetivos, curva de niveles y desbloqueos.
+- [scripts/simulate-review.ts](scripts/simulate-review.ts) — simula meses de repaso sin esperar 35
+  días: que fallar programa, que acertar promociona por los escalones previstos, que recaer devuelve
+  al principio y que un nodo aprendido sale de la cola y no vuelve.
 
 ## Qué es prototipo y qué no
 
@@ -137,7 +184,8 @@ El motor, el contenido, la corrección y el sistema de progresión sí son defin
 ## Siguientes pasos naturales
 
 - Backend real de auth y progreso (sustituir `LocalAuthService` y `services/storage.ts`).
-- Repaso espaciado: reaparición de los nodos fallados días después.
+- Aviso de repasos pendientes fuera de la app (notificación o correo): hoy la cola sólo se ve
+  entrando, que es justo lo que no hace quien lleva tres días sin abrirla.
 - Corrección con LLM para las redacciones libres de B1/B2, complementando la rúbrica con feedback
   sobre naturalidad y registro.
 - Audio (TTS) sobre los textos narrativos para trabajar también la comprensión oral.

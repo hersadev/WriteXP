@@ -2,6 +2,7 @@ import { ACHIEVEMENTS } from '@/data/achievements';
 import { LEVELS } from '@/data/levels';
 import { chaptersByLevel } from '@/data/story';
 import type { CEFRLevel, Chapter, ChapterGoal, Grade, Progress, RunStats } from '@/types';
+import { applyReview, needsReview, reviewGrade, scheduleReview } from './review';
 import { heroLevelFor } from './xp';
 
 // `RunStats` vive en el modelo de datos porque se persiste con el checkpoint,
@@ -19,6 +20,7 @@ export function createEmptyProgress(): Progress {
     overrideUnlocked: [],
     chapters: {},
     nodes: {},
+    reviews: {},
     stats: {
       wordsWritten: 0,
       answersTotal: 0,
@@ -32,8 +34,12 @@ export function createEmptyProgress(): Progress {
       streakDays: 0,
       lastPlayedISO: null,
       levelsCompleted: [],
+      reviewsDone: 0,
+      reviewsPerfect: 0,
+      reviewsGraduated: 0,
     },
     achievements: {},
+    onboardedAt: null,
   };
 }
 
@@ -43,6 +49,7 @@ function clone(progress: Progress): Progress {
     overrideUnlocked: [...progress.overrideUnlocked],
     chapters: { ...progress.chapters },
     nodes: { ...progress.nodes },
+    reviews: { ...progress.reviews },
     stats: { ...progress.stats, levelsCompleted: [...progress.stats.levelsCompleted] },
     achievements: { ...progress.achievements },
   };
@@ -92,6 +99,7 @@ export function registerAnswer(
   progress: Progress,
   run: RunStats,
   record: AnswerRecord,
+  now: number = Date.now(),
 ): { progress: Progress; run: RunStats } {
   const next = clone(progress);
   const nextRun: RunStats = { ...run };
@@ -115,6 +123,12 @@ export function registerAnswer(
   if (!scored) {
     // La narrativa y las decisiones de historia sólo suman XP.
     return { progress: next, run: nextRun };
+  }
+
+  // Repaso espaciado: lo que no ha salido a la primera y limpio entra en la cola
+  // y vuelve dentro de unos días, ya fuera de su capítulo.
+  if (needsReview(record)) {
+    next.reviews = scheduleReview(next.reviews, record.nodeId, record.grade, now);
   }
 
   next.stats.answersTotal += 1;
@@ -148,6 +162,79 @@ export function registerAnswer(
   }
 
   return { progress: next, run: nextRun };
+}
+
+export interface ReviewRecord {
+  nodeId: string;
+  grade: Grade;
+  attempts: number;
+  revealed: boolean;
+  xp: number;
+  words: number;
+}
+
+export interface ReviewApplied {
+  progress: Progress;
+  /** Nota con la que se ha movido el nodo de escalón. */
+  grade: Grade;
+  /** El nodo ha salido de la cola: superado en todos los escalones. */
+  graduated: boolean;
+  /** Escalón en el que queda, o null si ha salido. */
+  box: number | null;
+  newAchievements: string[];
+}
+
+/**
+ * Registra un repaso. Va por su cuenta y no por `registerAnswer` porque un
+ * repaso no es responder un nodo por primera vez: mueve el escalón de Leitner,
+ * paga XP reducida —y la paga siempre, aunque el nodo ya estuviera cobrado— y no
+ * toca la precisión de la campaña ni la racha del capítulo.
+ *
+ * Que la XP se repita no abre la puerta a granjearla: el nodo desaparece de la
+ * cola hasta que vuelva a vencer, y cada acierto lo aleja más.
+ */
+export function registerReview(
+  progress: Progress,
+  record: ReviewRecord,
+  now: number = Date.now(),
+): ReviewApplied {
+  let next = clone(progress);
+  const grade = reviewGrade(record);
+
+  const outcome = applyReview(next.reviews, record.nodeId, grade, now);
+  next.reviews = outcome.reviews;
+
+  next.xp += record.xp;
+  next.nodes[record.nodeId] = {
+    ...next.nodes[record.nodeId],
+    grade: record.grade,
+    attempts: record.attempts,
+    revealed: record.revealed,
+    xpEarned: Math.max(next.nodes[record.nodeId]?.xpEarned ?? 0, record.xp),
+  };
+
+  next.stats.wordsWritten += record.words;
+  next.stats.reviewsDone += 1;
+  if (grade === 'perfect') next.stats.reviewsPerfect += 1;
+  if (outcome.graduated) next.stats.reviewsGraduated += 1;
+
+  const synced = syncAchievements(next);
+  next = synced.progress;
+
+  return {
+    progress: next,
+    grade,
+    graduated: outcome.graduated,
+    box: outcome.box,
+    newAchievements: synced.unlocked,
+  };
+}
+
+/** Deja constancia de que ya se ha visto la introducción. */
+export function completeIntro(progress: Progress, now: Date = new Date()): Progress {
+  const next = clone(progress);
+  next.onboardedAt = now.toISOString();
+  return next;
 }
 
 /** Guarda en qué nodo se ha quedado el usuario, y con qué stats, para poder reanudar. */

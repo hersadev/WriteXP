@@ -15,10 +15,17 @@ const GRADE_TITLE: Record<GradeResult['grade'], string> = {
 export function WritingCard({
   node,
   combo,
+  xpBase,
   onComplete,
 }: {
   node: WritingNode;
   combo: number;
+  /**
+   * XP en juego, si no es la del nodo. Un repaso paga menos que la primera vez y
+   * la introducción no paga nada; en ese caso (0) desaparece todo el marcador,
+   * porque anunciar «+0 XP» es peor que no anunciar nada.
+   */
+  xpBase?: number;
   onComplete: (record: AnswerRecord) => void;
 }) {
   const [value, setValue] = useState('');
@@ -29,6 +36,7 @@ export function WritingCard({
   const [hintsShown, setHintsShown] = useState(0);
 
   const solved = result?.grade === 'perfect';
+  const base = xpBase ?? node.xp;
   const words = wordCount(value);
   const minWords = node.rubric?.minWords;
   const maxWords = node.rubric?.maxWords;
@@ -58,7 +66,7 @@ export function WritingCard({
   // Se puede seguir si está perfecto, si tras dos intentos está "casi", o si se rindió.
   const canAdvance = solved || revealed || (result?.grade === 'close' && attempts >= 2);
   /** XP que se lleva quien continúe ahora mismo, con el resultado que tenga. */
-  const gain = result ? computeXp(node.xp, result, Math.max(1, attempts), revealed) : 0;
+  const gain = result ? computeXp(base, result, Math.max(1, attempts), revealed) : 0;
   const canReveal = !solved && !revealed && attempts >= 2 && Boolean(model);
   // Cada pista nueva pide un intento más: la ayuda acompaña, no sustituye.
   const canAskHint = !solved && !revealed && hintsShown < hints.length && attempts > hintsShown;
@@ -82,7 +90,7 @@ export function WritingCard({
       attempts: Math.max(1, attempts),
       revealed,
       usedHint: hintsShown > 0,
-      xp: computeXp(node.xp, graded, Math.max(1, attempts), revealed),
+      xp: computeXp(base, graded, Math.max(1, attempts), revealed),
       words,
     });
   }
@@ -159,12 +167,14 @@ export function WritingCard({
         </p>
       )}
 
-      <XpStake
-        base={node.xp}
-        attempts={attempts}
-        revealed={revealed}
-        earned={solved || revealed ? gain : undefined}
-      />
+      {base > 0 && (
+        <XpStake
+          base={base}
+          attempts={attempts}
+          revealed={revealed}
+          earned={solved || revealed ? gain : undefined}
+        />
+      )}
 
       {!revealed &&
         hints.slice(0, hintsShown).map((hint, index) => (
@@ -228,7 +238,8 @@ export function WritingCard({
 
         {canAdvance && (
           <button type="button" className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={finish}>
-            Continuar <span className={solved ? 'xp-float' : 'xp-gain'}>+{gain} XP</span>
+            Continuar
+            {base > 0 && <span className={solved ? 'xp-float' : 'xp-gain'}> +{gain} XP</span>}
           </button>
         )}
       </div>

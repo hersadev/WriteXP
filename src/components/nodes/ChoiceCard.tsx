@@ -12,9 +12,12 @@ import type { ChoiceNode, ChoiceOption } from '@/types';
  */
 export function ChoiceCard({
   node,
+  xpBase,
   onComplete,
 }: {
   node: ChoiceNode;
+  /** XP en juego, si no es la del nodo (un repaso paga menos que la primera vez). */
+  xpBase?: number;
   onComplete: (record: AnswerRecord) => void;
 }) {
   const isQuiz = node.kind === 'readingCheck';
@@ -23,12 +26,13 @@ export function ChoiceCard({
   const [chosen, setChosen] = useState<ChoiceOption | null>(null);
 
   const settled = chosen !== null && (!isQuiz || chosen.correct === true);
+  const base = xpBase ?? node.xp;
 
   // La comprensión lectora paga como la escritura: acertar a la segunda cuesta
   // XP. Se calcula aquí para que el marcador y lo que se cobra sean el mismo número.
   const grade = !isQuiz || attempts <= 1 ? 'perfect' : 'close';
   const quizXp = computeXp(
-    node.xp,
+    base,
     { grade, ratio: grade === 'perfect' ? 1 : 0.7, notes: [] },
     Math.max(1, attempts),
     false,
@@ -67,7 +71,7 @@ export function ChoiceCard({
       attempts: Math.max(1, attempts),
       revealed: false,
       usedHint: false,
-      xp: isQuiz ? quizXp : node.xp,
+      xp: isQuiz ? quizXp : base,
       words: 0,
       scored: isQuiz,
     });
@@ -105,7 +109,9 @@ export function ChoiceCard({
         ))}
       </div>
 
-      {isQuiz && <XpStake base={node.xp} attempts={attempts} earned={settled ? quizXp : undefined} />}
+      {isQuiz && base > 0 && (
+        <XpStake base={base} attempts={attempts} earned={settled ? quizXp : undefined} />
+      )}
 
       {chosen?.feedback && (
         <div className="feedback" data-grade={!isQuiz ? 'perfect' : chosen.correct ? 'perfect' : 'wrong'}>

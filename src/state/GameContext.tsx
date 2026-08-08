@@ -1,14 +1,19 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   completeChapter as completeChapterEngine,
+  completeIntro,
   createEmptyProgress,
   registerAnswer,
+  registerReview,
   saveCheckpoint,
   touchStreak,
   type AnswerRecord,
   type ChapterOutcome,
+  type ReviewApplied,
+  type ReviewRecord,
   type RunStats,
 } from '@/engine/progress';
+import { nextReviewDate, reviewQueueSize, reviewSession, type DueReview } from '@/engine/review';
 import { heroLevelFor, heroLevelInfo, heroTitle, type HeroLevelInfo } from '@/engine/xp';
 import { loadProgress, resetProgress, saveProgress } from '@/services/storage';
 import type { CEFRLevel, Chapter, Progress } from '@/types';
@@ -24,6 +29,12 @@ export interface LevelUpEvent {
 
 interface GameContextValue {
   progress: Progress;
+  /**
+   * El progreso del usuario ya está cargado. Hasta que no lo esté, `progress` es
+   * el de una partida vacía, y decidir nada con él —por ejemplo, si toca enseñar
+   * la introducción— sería decidirlo con datos falsos.
+   */
+  ready: boolean;
   hero: HeroLevelInfo;
   /** Logros recién desbloqueados pendientes de mostrar como aviso. */
   pendingAchievements: string[];
@@ -36,6 +47,15 @@ interface GameContextValue {
   commitAnswer: (run: RunStats, record: AnswerRecord) => RunStats;
   checkpoint: (chapterId: string, nodeIndex: number, run: RunStats) => void;
   finishChapter: (chapter: Chapter, run: RunStats) => ChapterOutcome;
+  /** Nodos que toca repasar hoy, ya recortados a una sesión. */
+  due: DueReview[];
+  /** Nodos en la cola de repaso, venzan hoy o no. */
+  queueSize: number;
+  /** Cuándo vence el siguiente repaso, o null si no queda ninguno pendiente. */
+  nextReview: Date | null;
+  commitReview: (record: ReviewRecord) => ReviewApplied;
+  /** Marca la introducción como vista. */
+  finishIntro: () => void;
   resetAll: () => void;
 }
 
@@ -44,6 +64,7 @@ const GameContext = createContext<GameContextValue | null>(null);
 export function GameProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [progress, setProgress] = useState<Progress>(createEmptyProgress);
+  const [ready, setReady] = useState(false);
   const [pendingAchievements, setPendingAchievements] = useState<string[]>([]);
   const [levelUp, setLevelUp] = useState<LevelUpEvent | null>(null);
   const levelUpSeq = useRef(0);
@@ -76,11 +97,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const empty = createEmptyProgress();
       latest.current = empty;
       setProgress(empty);
+      setReady(false);
       return;
     }
     const loaded = touchStreak(loadProgress(user.id));
     latest.current = loaded;
     setProgress(loaded);
+    setReady(true);
     saveProgress(user.id, loaded);
   }, [user]);
 
@@ -125,6 +148,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [apply],
   );
 
+  const commitReview = useCallback(
+    (record: ReviewRecord): ReviewApplied => {
+      const applied = registerReview(latest.current, record);
+      apply(applied.progress);
+      if (applied.newAchievements.length) {
+        setPendingAchievements((queue) => [...queue, ...applied.newAchievements]);
+      }
+      return applied;
+    },
+    [apply],
+  );
+
+  const finishIntro = useCallback(() => apply(completeIntro(latest.current)), [apply]);
+
   const dismissAchievement = useCallback((id: string) => {
     setPendingAchievements((queue) => queue.filter((item) => item !== id));
   }, []);
@@ -143,6 +180,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const value = useMemo<GameContextValue>(
     () => ({
       progress,
+      ready,
       hero: heroLevelInfo(progress.xp),
       pendingAchievements,
       dismissAchievement,
@@ -153,10 +191,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
       commitAnswer,
       checkpoint,
       finishChapter,
+      // La cola se mira contra el reloj de este render. No hace falta más: lo que
+      // vence lo hace a medianoche, y para entonces ya se habrá vuelto a pintar.
+      due: reviewSession(progress),
+      queueSize: reviewQueueSize(progress),
+      nextReview: nextReviewDate(progress),
+      commitReview,
+      finishIntro,
       resetAll,
     }),
     [
       progress,
+      ready,
       pendingAchievements,
       dismissAchievement,
       levelUp,
@@ -166,6 +212,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       commitAnswer,
       checkpoint,
       finishChapter,
+      commitReview,
+      finishIntro,
       resetAll,
     ],
   );

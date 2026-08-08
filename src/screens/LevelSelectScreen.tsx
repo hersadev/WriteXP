@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LEVELS } from '@/data/levels';
 import { chaptersByLevel } from '@/data/story';
 import { isLevelUnlocked, levelCompletion } from '@/engine/progress';
@@ -8,7 +8,7 @@ import type { LevelDef } from '@/types';
 
 export function LevelSelectScreen() {
   const { user } = useAuth();
-  const { progress, hero, chooseLevel, forceUnlock } = useGame();
+  const { progress, hero, chooseLevel, forceUnlock, due, queueSize, nextReview } = useGame();
   const navigate = useNavigate();
 
   function enter(level: LevelDef) {
@@ -27,7 +27,39 @@ export function LevelSelectScreen() {
           Cada nivel del MCER es un acto de la misma historia. Puedes seguir el orden o entrar directamente
           donde te corresponda: nadie te obliga a empezar por el principio si ya sabes escribir.
         </p>
+        <Link to="/intro" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start', marginLeft: -14 }}>
+          ¿Cómo se juega?
+        </Link>
       </div>
+
+      {/* El repaso va antes que los actos: si hay algo que vence hoy, es lo
+          primero que conviene hacer, no lo que se descubre al bajar del todo. */}
+      {due.length > 0 ? (
+        <div className="card review-banner">
+          <span className="review-banner-sigil">↻</span>
+          <span className="stack" style={{ gap: 4, flex: 1, minWidth: 0 }}>
+            <strong style={{ fontFamily: 'var(--serif)', fontSize: 19 }}>
+              {due.length === 1 ? 'Tienes 1 repaso pendiente' : `Tienes ${due.length} repasos pendientes`}
+            </strong>
+            <span className="muted" style={{ fontSize: 14 }}>
+              Ejercicios que no te salieron a la primera y hoy vuelven. Cinco minutos y siguen
+              dando XP.
+            </span>
+          </span>
+          <Link to="/review" className="btn btn-primary">
+            Repasar
+          </Link>
+        </div>
+      ) : (
+        queueSize > 0 &&
+        nextReview && (
+          <p className="faint" style={{ fontSize: 13.5 }}>
+            ↻ {queueSize} {queueSize === 1 ? 'ejercicio en repaso' : 'ejercicios en repaso'}; el
+            siguiente vuelve el{' '}
+            {nextReview.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}.
+          </p>
+        )
+      )}
 
       <div className="level-grid">
         {LEVELS.map((level) => {
