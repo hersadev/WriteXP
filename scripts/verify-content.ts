@@ -10,6 +10,7 @@
 import { CHAPTERS, chapterMaxXp } from '../src/data/story';
 import { LEVELS } from '../src/data/levels';
 import { ACHIEVEMENTS } from '../src/data/achievements';
+import { INTRO_NODE } from '../src/data/onboarding';
 import { gradeWriting } from '../src/engine/grading';
 import { containsPhrase, normalize } from '../src/engine/text';
 import type { CEFRLevel, WritingNode } from '../src/types';
@@ -259,6 +260,32 @@ for (const chapter of CHAPTERS) {
       );
     }
   }
+}
+
+/*
+ * El ejercicio de la introducción no está en ningún capítulo, pero es el primero
+ * que ve nadie y se corrige con el mismo motor: se le exige lo mismo que a un
+ * nodo de A1 —ejemplo, dos pistas, solución— y sobre todo que no regale la
+ * respuesta ni en el enunciado ni en el ejemplo ni en el placeholder.
+ */
+if (!INTRO_NODE.answers?.length && !INTRO_NODE.rubric) {
+  problems.push(`${INTRO_NODE.id}: sin 'answers' ni 'rubric', no se puede corregir`);
+}
+if (!INTRO_NODE.promptEs) problems.push(`${INTRO_NODE.id}: sin consigna en español`);
+if (!INTRO_NODE.example) problems.push(`${INTRO_NODE.id}: la introducción necesita un ejemplo resuelto`);
+if (!INTRO_NODE.hint) problems.push(`${INTRO_NODE.id}: sin pista`);
+if (!INTRO_NODE.hint2) problems.push(`${INTRO_NODE.id}: la introducción necesita una segunda pista`);
+if (!INTRO_NODE.model) problems.push(`${INTRO_NODE.id}: sin solución modelo que enseñar al rendirse`);
+if (INTRO_NODE.xp !== 0) problems.push(`${INTRO_NODE.id}: la introducción no debe repartir XP`);
+if (nodeIds.has(INTRO_NODE.id)) problems.push(`${INTRO_NODE.id}: choca con un nodo de la campaña`);
+
+checkPrompt(INTRO_NODE, problems);
+if (INTRO_NODE.example) checkExample(INTRO_NODE, problems);
+if (INTRO_NODE.placeholder) checkPlaceholder(INTRO_NODE, problems);
+
+const introModel = INTRO_NODE.model ?? INTRO_NODE.answers?.[0];
+if (introModel && gradeWriting(INTRO_NODE, introModel).grade !== 'perfect') {
+  problems.push(`${INTRO_NODE.id}: la solución modelo no aprueba su propio criterio`);
 }
 
 const achievementIds = new Set<string>();

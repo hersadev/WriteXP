@@ -19,7 +19,20 @@ export function loadProgress(userId: string): Progress {
     if (envelope.version !== VERSION) return createEmptyProgress();
 
     // Rellena campos que puedan faltar si el guardado viene de una build anterior.
-    return { ...createEmptyProgress(), ...envelope.progress, stats: { ...createEmptyProgress().stats, ...envelope.progress.stats } };
+    const base = createEmptyProgress();
+    const progress: Progress = {
+      ...base,
+      ...envelope.progress,
+      stats: { ...base.stats, ...envelope.progress.stats },
+    };
+
+    // Quien ya venía jugando antes de que existiera la introducción no necesita
+    // que se la enseñen: lo que explica ya lo ha aprendido a base de jugarlo.
+    if (!progress.onboardedAt && progress.stats.answersTotal > 0) {
+      progress.onboardedAt = progress.stats.lastPlayedISO ?? new Date().toISOString();
+    }
+
+    return progress;
   } catch {
     return createEmptyProgress();
   }

@@ -8,7 +8,7 @@ const AFTERGLOW_MS = 2600;
 
 export function HeroBar() {
   const { user, signOut } = useAuth();
-  const { hero, progress, levelUp } = useGame();
+  const { hero, progress, levelUp, due } = useGame();
   const navigate = useNavigate();
 
   // La cadena se enciende al *cerrarse* el pregón, no mientras se muestra: el
@@ -57,6 +57,15 @@ export function HeroBar() {
             <span className="streak" title="Días seguidos escribiendo">
               🔥 {progress.stats.streakDays}
             </span>
+          )}
+          {due.length > 0 && (
+            <Link
+              to="/review"
+              className="btn btn-ghost btn-sm review-pill"
+              title={`${due.length} ${due.length === 1 ? 'repaso pendiente' : 'repasos pendientes'}`}
+            >
+              ↻ <span className="review-pill-count">{due.length}</span>
+            </Link>
           )}
           <Link to="/achievements" className="btn btn-ghost btn-sm" title="Logros">
             🏅

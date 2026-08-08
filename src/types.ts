@@ -194,6 +194,29 @@ export interface NodeResult {
 export type Grade = 'perfect' | 'close' | 'wrong';
 
 /**
+ * Un ejercicio que no salió limpio, esperando su turno de repaso.
+ *
+ * El sistema es una caja de Leitner: cada acierto sube el nodo un escalón y
+ * retrasa el siguiente repaso (1 → 3 → 7 → 16 → 35 días); cada fallo lo devuelve
+ * al primero. Cuando supera el último escalón sale de la cola: se da por
+ * aprendido. Vive en `Progress` y no en el capítulo porque un repaso no es
+ * volver a jugar el capítulo, sino ver el nodo suelto, fuera de su contexto.
+ */
+export interface ReviewItem {
+  nodeId: string;
+  /** Escalón de Leitner: índice en `REVIEW_INTERVALS_DAYS`. */
+  box: number;
+  /** Fecha a partir de la cual toca repasarlo. */
+  dueISO: string;
+  /** Veces que ha vuelto al primer escalón: mide qué se te resiste de verdad. */
+  lapses: number;
+  /** Repasos hechos hasta ahora. */
+  reviews: number;
+  /** Cómo fue el último encuentro con el nodo. */
+  lastGrade: Grade;
+}
+
+/**
  * Estadísticas de una partida a un capítulo. Se persisten junto al checkpoint:
  * si sólo se guardase el nodo en el que se quedó, al reanudar arrancarían a cero
  * y los objetivos del capítulo (palabras, aciertos, racha) serían inalcanzables.
@@ -237,6 +260,15 @@ export interface Stats {
   streakDays: number;
   lastPlayedISO: string | null;
   levelsCompleted: CEFRLevel[];
+  /**
+   * Los repasos se cuentan aparte de `answersTotal` a propósito: la precisión de
+   * la campaña mide cómo vas leyendo la historia por primera vez, y mezclarla con
+   * los repasos —que por definición son de lo que ya fallaste— la falsearía.
+   */
+  reviewsDone: number;
+  reviewsPerfect: number;
+  /** Nodos que han superado el último escalón y han salido de la cola. */
+  reviewsGraduated: number;
 }
 
 export interface Progress {
@@ -246,8 +278,12 @@ export interface Progress {
   overrideUnlocked: CEFRLevel[];
   chapters: Record<string, ChapterProgress>;
   nodes: Record<string, NodeResult>;
+  /** Cola de repaso espaciado, indexada por id de nodo. */
+  reviews: Record<string, ReviewItem>;
   stats: Stats;
   achievements: Record<string, string>; // id -> fecha ISO de desbloqueo
+  /** Fecha en que se vio la introducción, o null si todavía no se ha visto. */
+  onboardedAt: string | null;
 }
 
 export interface User {

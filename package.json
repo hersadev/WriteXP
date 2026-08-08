@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "verify": "tsx scripts/verify-content.ts && tsx scripts/simulate-playthrough.ts"
+    "verify": "tsx scripts/verify-content.ts && tsx scripts/simulate-playthrough.ts && tsx scripts/simulate-review.ts"
   },
   "dependencies": {
     "react": "^18.3.1",
